@@ -1,4 +1,6 @@
+open Types
 open Environment
+open Checker
 open Toy
 open Lexer
 open Parser

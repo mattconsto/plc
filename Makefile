@@ -13,7 +13,7 @@
 
 # These are the object files needed to rebuild the mysplinterpreter executable file
 #
-OBJS = parser.cmo lexer.cmo Environment.cmo Toy.cmo mysplinterpreter.cmo
+OBJS = parser.cmo lexer.cmo Types.cmo Environment.cmo Checker.cmo Toy.cmo mysplinterpreter.cmo
 
 COMMONOBJS = str.cma
 
@@ -64,3 +64,8 @@ clean::
 # Rebuild intermodule dependencies
 depend:: $(DEPEND)
 	ocamldep *.mli *.ml > .depend
+
+full::
+	make clean
+	make depend
+	make

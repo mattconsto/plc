@@ -1,3 +1,4 @@
+(* Thrown if and only if, we reach the Head node of our tree *)
 exception EnvironmentReachedHead
 
 (* Type of Environments *)
@@ -11,6 +12,7 @@ let rec lookup env str = match env with
 		| true  -> thing
 		| false -> lookup (Env (env, ref gs)) str)
 
+(* Recurse up the Environment Tree, until we have rebound our variable *)
 let rec rebind env str thing = match env with
 	| Head             -> raise EnvironmentReachedHead
 	| Env (parent, gs) -> match (List.fold_left (fun a (name, thing) -> a || str = name) false !gs) with
@@ -25,16 +27,20 @@ let bind env str thing = match env with
 		with
 			| EnvironmentReachedHead -> gs := ((str, thing) :: !gs); env
 
-let unbind env str = match env with
-	| Head             -> raise EnvironmentReachedHead
-	| Env (parent, gs) -> gs := List.filter (fun (name, thing) -> str != name) !gs; env
+(* Remove an entry from the tree of environments *)
+let rec unbind env str = match env with
+	| Head             -> env
+	| Env (parent, gs) -> ignore (unbind parent str); gs := List.filter (fun (name, thing) -> str != name) !gs; env
 
+(* Get the parent of our environment *)
 let parent env = match env with
 	| Head             -> raise EnvironmentReachedHead
 	| Env (parent, gs) -> parent
 
+(* Extend our environment *)
 let extend env = Env (env, ref [])
 
+(* Private debug function that formats the environment as a string *)
 let rec environment_to_string env = let rec entries_to_string l = match l with
 	| [] -> ""
 	| (h, a) :: t -> h ^ (entries_to_string t)

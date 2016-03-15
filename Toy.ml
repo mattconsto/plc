@@ -1,65 +1,11 @@
 open Printf;;
+open Types;;
 open Environment;;
+open Checker;;
 
-(* Types of the language *)
-type toyType = ToyUnit | ToyInt | ToyPair of toyType * toyType | ToyFun of toyType * toyType
-
-(* Grammar of the language *)
-type toyTerm =
-	| TmUnit
-	| TmNum of int
-	| TmPair of toyTerm * toyTerm
-	| TmString of string
-
-	| TmLessThan of toyTerm * toyTerm
-	| TmLessThanEqual of toyTerm * toyTerm
-	| TmMoreThan of toyTerm * toyTerm
-	| TmMoreThanEqual of toyTerm * toyTerm
-	| TmEqual of toyTerm * toyTerm
-	| TmNotEqual of toyTerm * toyTerm
-
-	| TmUnaryNot of toyTerm
-	| TmUnaryMinus of toyTerm
-	| TmUnaryPlus of toyTerm
-
-	| TmPower of toyTerm * toyTerm
-	| TmMultiply of toyTerm * toyTerm
-	| TmDivide of toyTerm * toyTerm
-	| TmModulo of toyTerm * toyTerm
-	| TmPlus of toyTerm * toyTerm
-	| TmSubtract of toyTerm * toyTerm
-
-	| TmShiftLeft of toyTerm * toyTerm
-	| TmShiftRight of toyTerm * toyTerm
-	| TmBitwiseAnd of toyTerm * toyTerm
-	| TmBitwiseXOr of toyTerm * toyTerm
-	| TmBitwiseOr of toyTerm * toyTerm
-
-	| TmWhile of toyTerm * toyTerm
-	| TmDo of toyTerm * toyTerm
-	| TmFor of toyTerm * toyTerm * toyTerm * toyTerm
-	| TmBreak
-	| TmContinue
-	| TmAssert of toyTerm
-	| TmRead of toyTerm
-	| TmPrint of toyTerm
-	| TmToString of toyTerm
-
-	| TmCons of toyTerm * toyTerm
-	| TmHead of toyTerm
-	| TmTail of toyTerm
-
-	| TmVar of string
-	| TmIf of toyTerm * toyTerm * toyTerm
-	| TmLet of string * toyType * toyTerm
-	| TmReBind of string * toyTerm
-	| TmAbs of string * toyType * toyTerm
-
-exception TypeError of string;;
 exception UnboundVariableError of string;;
 exception Terminated of string;;
 exception StuckTerm of string;;
-exception FreeError;;
 exception SubstitutionError;;
 exception NonBaseTypeResult;;
 exception AssertionFailed of toyTerm;;
@@ -75,90 +21,20 @@ let rec isValue e = match e with
 let global_type  = extend Head
 let global_value = extend Head
 
-(* The type checking function itself *)
-let rec typeOf env e = match e with
-	(* data *)
-	| TmUnit     -> ToyUnit
-	| TmNum  (n) -> ToyInt
-	| TmPair (a, b) -> ToyPair ((typeOf env a), (typeOf env b))
-	| TmVar  (x) -> (try lookup env x with EnvironmentReachedHead -> raise (TypeError ("Variable: " ^ x)))
-	| TmString (s) -> ToyPair (ToyInt, ToyInt)
-
-	| TmRead n -> (match n with
-		| TmNum a -> (let rec build a = if a = 0 then ToyUnit else ToyPair(ToyInt, build (a-1)) in build a)
-		| _       -> raise (TypeError "Read"))
-	| TmToString a | TmPrint a -> ToyUnit
-
-	(* int -> int -> bool *)
-	| TmLessThan (a, b) | TmLessThanEqual (a, b) | TmMoreThan (a, b) | TmMoreThanEqual (a, b) | TmEqual (a, b) | TmNotEqual (a, b)
-	-> (match (typeOf env a), (typeOf env b) with
-		| ToyInt, ToyInt -> ToyInt
-		| _ -> raise (TypeError "Comparison"))
-
-	(* int/bool -> int/bool *)
-	| TmUnaryNot (a)
-	 -> (match (typeOf env a) with
-		| ToyInt -> ToyInt
-		| _ -> raise (TypeError "Unary Not"))
-
-	(* int -> int *)
-	| TmUnaryMinus (a) | TmUnaryPlus (a)
-	-> (match (typeOf env a) with
-		| ToyInt -> ToyInt
-		| _ -> raise (TypeError "Unary Operation"))
-
-	(* int -> int -> int *)
-	| TmPower (a, b) | TmMultiply (a, b) | TmDivide (a, b) | TmModulo (a, b) | TmPlus (a, b) | TmSubtract (a, b)
-	| TmShiftLeft (a, b) | TmShiftRight (a, b) | TmBitwiseAnd (a, b) | TmBitwiseXOr (a, b) | TmBitwiseOr (a, b)
-	-> (match (typeOf env a), (typeOf env b) with
-		| ToyInt, ToyInt -> ToyInt
-		| _ -> raise (TypeError "Binary Operation"))
-
-	| TmWhile (a, b) | TmDo (a, b) -> let scope = extend env in (ignore (typeOf scope a); ignore (typeOf scope b)); ToyUnit
-	| TmFor(a, b, c, d) -> let scope = extend env in (ignore (typeOf scope a); ignore (typeOf scope b); ignore (typeOf scope c); ignore (typeOf scope d)); ToyUnit
-	| TmAssert (a) -> ToyUnit
-	| TmBreak -> ToyUnit
-	| TmContinue -> ToyUnit
-
-	| TmCons (a, b) -> (match typeOf env a, typeOf env b with n, m -> ToyPair (n, m))
-	| TmHead (a) -> (match typeOf env a with ToyPair(j, k) -> j | _ -> raise (TypeError "Head"))
-	| TmTail (a) -> (match typeOf env a with ToyPair(j, k) -> k | _ -> raise (TypeError "Tail"))
-
-	(* complicated *)
-	| TmIf (e1,e2,e3) -> let scope = extend env in (ignore (typeOf scope e1); ignore (typeOf scope e2); ignore (typeOf scope e3)); ToyUnit
-
-	| TmLet (x, tT, e1) -> (match ((typeOf env e1) = tT) with
-		| true -> ignore (bind env x tT); ToyUnit
-		| false -> raise (TypeError "Let"))
-
-	| TmReBind (x, e1) -> (match ((typeOf env e1) = (lookup env x)) with
-		| true  ->  ToyUnit
-		| false -> raise (TypeError "Rebind"))
-
-	| TmAbs (x,tT,e) -> ignore (bind env x tT); ToyFun(tT, typeOf env e)
-
-let rec type_to_string tT = match tT with
-	| ToyUnit -> "unit"
-	| ToyInt  -> "int"
-	| ToyPair(a, ToyUnit) -> sprintf "[%s]" (type_to_string a)
-	| ToyPair(a, b) -> sprintf "[%s.%s]" (type_to_string a) (type_to_string b)
-	| ToyFun(tT1, tT2) -> "( "^type_to_string(tT1)^" -> "^type_to_string(tT2)^" )"
-;;
-
 let rec string_res res = match res with
 	| TmUnit        -> "[]"
 	| TmNum i       -> sprintf "%i" i
-	| TmPair(a, b) -> match b with
+	| TmPair(a, b) -> (match b with
 		| TmUnit -> (string_res a)
-		| _      -> (string_res a) ^ " " ^ (string_res b)
+		| _      -> (string_res a) ^ " " ^ (string_res b))
 	| _ -> raise NonBaseTypeResult
 
 let rec string_res_string res = match res with
 	| TmUnit        -> ""
 	| TmNum i       -> String.make 1 (Char.chr i)
-	| TmPair(a, b) -> match b with
+	| TmPair(a, b) -> (match b with
 		| TmUnit -> (string_res_string a)
-		| _      -> (string_res_string a) ^ (string_res_string b)
+		| _      -> (string_res_string a) ^ (string_res_string b))
 	| _ -> raise NonBaseTypeResult
 
 let eval_equals e = (match e with
@@ -177,7 +53,8 @@ let read_number_cache = ref [];;
 let read_number = fun () -> (
 	if !read_number_cache = [] then	ignore (read_number_cache := Str.split (Str.regexp " ") (read_line ()));
 	match !read_number_cache with
-		| (head :: tail) -> (read_number_cache := tail; int_of_string head));;
+		| (head :: tail) -> (read_number_cache := tail; int_of_string head)
+		| [] -> raise (TypeError "Foo"));;
 
 (* bigEval *)
 let rec eval env e = match e with

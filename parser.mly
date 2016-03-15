@@ -1,4 +1,5 @@
 %{
+	open Types
 	open Toy
 %}
 /* Keywords */
@@ -51,18 +52,8 @@
 %start parser
 
 /* Return Types */
-%type <Toy.toyType> type_spec
-%type <Toy.toyTerm> parser
-%type <Toy.toyTerm> expr
-%type <Toy.toyTerm> exprs
-%type <Toy.toyTerm> data
-%type <Toy.toyTerm> list
-%type <Toy.toyTerm> assign
-%type <Toy.toyTerm> conditional
-%type <Toy.toyTerm> unary
-%type <Toy.toyTerm> binary
-%type <Toy.toyTerm> compare
-%type <Toy.toyTerm> bitwise
+%type <Types.toyType> type_spec
+%type <Types.toyTerm> parser
 
 %%
 
@@ -84,6 +75,7 @@ exprs:
 
 expr:
 	| SEMI_COLON                                       { TmUnit }
+	| ROUNDL ROUNDR                                    { TmUnit }
 
 	| loop                                             { $1 }
 	| assign                                           { $1 }
