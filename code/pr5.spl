@@ -1,0 +1,13 @@
+/*
+  assign variables
+*/
+int a = 0;
+int b = 0;
+int t = 0;
+
+while true do {
+  t = a + b + (head read 1);
+  a = b;
+  b = t;
+  print t;
+}

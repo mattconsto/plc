@@ -1,0 +1,4 @@
+while true do {
+	int num = head (read 1);
+	print [num, num];
+}

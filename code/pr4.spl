@@ -1,0 +1,6 @@
+int total = 0
+
+while true do {
+  total += head read 1;
+  print total;
+}

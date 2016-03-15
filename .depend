@@ -1,0 +1,13 @@
+Environment.cmi :
+Toy.cmi :
+parser.cmi : Toy.cmi
+Environment.cmo : Environment.cmi
+Environment.cmx : Environment.cmi
+Toy.cmo : Environment.cmi Toy.cmi
+Toy.cmx : Environment.cmx Toy.cmi
+lexer.cmo : parser.cmi
+lexer.cmx : parser.cmx
+mysplinterpreter.cmo : Toy.cmi parser.cmi lexer.cmo Environment.cmi
+mysplinterpreter.cmx : Toy.cmx parser.cmx lexer.cmx Environment.cmx
+parser.cmo : Toy.cmi parser.cmi
+parser.cmx : Toy.cmx parser.cmi

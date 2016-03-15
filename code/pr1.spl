@@ -1,0 +1,6 @@
+print 0;
+
+/* Lets print what we read, forever! */
+while true do {
+	print read 1;
+}
