@@ -10,6 +10,7 @@
 #                  you add new modules or new dependencies between
 #                  existing modules.  (The graph is stored in the file
 #                  .depend)
+#  make full    runs clean, depend and all in order
 
 # These are the object files needed to rebuild the mysplinterpreter executable file
 #
@@ -62,10 +63,7 @@ clean::
 	rm -rf Lexer.ml Parser.ml Parser.mli *.o *.cmo *.cmi Parser.output c TAGS *~
 
 # Rebuild intermodule dependencies
-depend:: $(DEPEND)
+depend: $(DEPEND)
 	ocamldep *.mli *.ml > .depend
 
-full::
-	make clean
-	make depend
-	make
+full: clean depend all

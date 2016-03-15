@@ -1,138 +1,128 @@
 open Types
 open Environment
 
-exception UnboundVariableError of string;;
-exception Terminated of string;;
-exception StuckTerm of string;;
-exception SubstitutionError;;
-exception NonBaseTypeResult;;
-exception AssertionFailed of toyTerm;;
-exception LoopBreak;;
-exception LoopContinue;;
+exception StuckTerm of string
+exception NonBaseTypeResult
 
-let rec isValue e = match e with
-	| TmNum n        -> true
-	| TmAbs(x,tT,e') -> true
-	| _              -> false
-;;
+exception AssertionFailed of aquaTerm
+exception LoopBreak
+exception LoopContinue
 
 let rec string_res res = match res with
-	| TmUnit        -> "[]"
-	| TmNum i       -> Printf.sprintf "%i" i
-	| TmPair(a, b) -> (match b with
-		| TmUnit -> (string_res a)
+	| TermUnit        -> "[]"
+	| TermNum i       -> Printf.sprintf "%i" i
+	| TermPair(a, b) -> (match b with
+		| TermUnit -> (string_res a)
 		| _      -> (string_res a) ^ " " ^ (string_res b))
 	| _ -> raise NonBaseTypeResult
 
 let rec string_res_string res = match res with
-	| TmUnit        -> ""
-	| TmNum i       -> String.make 1 (Char.chr i)
-	| TmPair(a, b) -> (match b with
-		| TmUnit -> (string_res_string a)
+	| TermUnit        -> ""
+	| TermNum i       -> String.make 1 (Char.chr i)
+	| TermPair(a, b) -> (match b with
+		| TermUnit -> (string_res_string a)
 		| _      -> (string_res_string a) ^ (string_res_string b))
 	| _ -> raise NonBaseTypeResult
 
-let eval_equals e = (match e with
-	| TmNum  0
-	| TmUnit -> false
-	| TmPair(_, _)
-	| TmNum _ -> true
+let equality_test e = (match e with
+	| TermNum  0
+	| TermUnit -> false
+	| TermPair(_, _)
+	| TermNum _ -> true
 	| _ -> raise (StuckTerm "If"))
 
-let eval_string s =
-  let rec exp i l =
-    if i < 0 then l else exp (i - 1) (TmCons (TmNum (Char.code s.[i]), l)) in
-  exp (String.length s - 1) TmUnit
-
+(* Read lines, caching the numbers found *)
 let read_number_cache = ref [];;
 let read_number = fun () -> (
 	if !read_number_cache = [] then	ignore (read_number_cache := Str.split (Str.regexp " ") (read_line ()));
 	match !read_number_cache with
 		| (head :: tail) -> (read_number_cache := tail; int_of_string head)
-		| [] -> raise LoopContinue);;
+		| [] -> raise NonBaseTypeResult);;
 
 (* bigEval *)
 let rec eval env e = match e with
-	| TmVar x -> lookup env x
-	| e when isValue e -> e
+	| TermVar x -> lookup env x
+	| TermNum n -> TermNum n
 
-	| TmString (s)           -> eval env (eval_string s)
+	| TermString (s)           -> eval env (
+		let rec exp i l = if i < 0 then l else exp (i - 1) (TermCons (TermNum (Char.code s.[i]), l)) in
+		exp (String.length s - 1) TermUnit)
 
-	| TmRead n -> (match n with
-		| TmNum a -> (let rec build a = if a = 0 then TmUnit else let left = read_number () and right = build (a-1) in TmPair(TmNum left, right) in build a)
+	| TermRead n -> (match n with
+		| TermNum a -> (let rec build a = if a = 0 then TermUnit else let left = read_number () and right = build (a-1) in TermPair(TermNum left, right) in build a)
 		| _       -> raise (StuckTerm "Read"))
 
-	| TmPrint a              -> print_string (string_res (eval env a) ^ "\n"); TmUnit
-	| TmToString a             -> print_string (string_res_string (eval env a) ^ "\n"); TmUnit
+	| TermPrint a              -> print_string (string_res (eval env a) ^ "\n"); TermUnit
+	| TermToString a             -> print_string (string_res_string (eval env a) ^ "\n"); TermUnit
 
-	| TmLessThan      (a, b) -> (match eval env a, eval env b with TmNum n, TmNum m -> TmNum(if n <  m then 1 else 0)  | _ -> raise (StuckTerm "Less than"))
-	| TmLessThanEqual (a, b) -> (match eval env a, eval env b with TmNum n, TmNum m -> TmNum(if n <= m then 1 else 0)  | _ -> raise (StuckTerm "Less than Equal"))
-	| TmMoreThan      (a, b) -> (match eval env a, eval env b with TmNum n, TmNum m -> TmNum(if n >  m then 1 else 0)  | _ -> raise (StuckTerm "More than"))
-	| TmMoreThanEqual (a, b) -> (match eval env a, eval env b with TmNum n, TmNum m -> TmNum(if n >= m then 1 else 0)  | _ -> raise (StuckTerm "More than Equal"))
-	| TmEqual         (a, b) -> (match eval env a, eval env b with TmNum n, TmNum m -> TmNum(if n =  m then 1 else 0)  | _ -> raise (StuckTerm "Equal"))
-	| TmNotEqual      (a, b) -> (match eval env a, eval env b with TmNum n, TmNum m -> TmNum(if n != m then 1 else 0)  | _ -> raise (StuckTerm "Not Equal"))
+	| TermLessThan      (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(if n <  m then 1 else 0)  | _ -> raise (StuckTerm "Less than"))
+	| TermLessThanEqual (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(if n <= m then 1 else 0)  | _ -> raise (StuckTerm "Less than Equal"))
+	| TermMoreThan      (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(if n >  m then 1 else 0)  | _ -> raise (StuckTerm "More than"))
+	| TermMoreThanEqual (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(if n >= m then 1 else 0)  | _ -> raise (StuckTerm "More than Equal"))
+	| TermEqual         (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(if n =  m then 1 else 0)  | _ -> raise (StuckTerm "Equal"))
+	| TermNotEqual      (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(if n != m then 1 else 0)  | _ -> raise (StuckTerm "Not Equal"))
 
-	| TmUnaryNot      (a)    -> (match eval env a with TmNum n -> TmNum(lnot n) | _ -> raise (StuckTerm "Unary Not"))
-	| TmUnaryMinus    (a)    -> (match eval env a with TmNum n -> TmNum(-(n))   | _ -> raise (StuckTerm "Unary Minus"))
-	| TmUnaryPlus     (a)    -> (match eval env a with TmNum n -> TmNum(+(n))   | _ -> raise (StuckTerm "Unary Plus"))
+	| TermUnaryNot      (a)    -> (match eval env a with TermNum n -> TermNum(lnot n) | _ -> raise (StuckTerm "Unary Not"))
+	| TermUnaryMinus    (a)    -> (match eval env a with TermNum n -> TermNum(-(n))   | _ -> raise (StuckTerm "Unary Minus"))
+	| TermUnaryPlus     (a)    -> (match eval env a with TermNum n -> TermNum(+(n))   | _ -> raise (StuckTerm "Unary Plus"))
 
-	| TmPower         (a, b) -> (match eval env a, eval env b with TmNum n, TmNum m -> TmNum(int_of_float (float_of_int n ** float_of_int m)) | _ -> raise (StuckTerm "Power"))
-	| TmMultiply      (a, b) -> (match eval env a, eval env b with TmNum n, TmNum m -> TmNum(n * m)   | _ -> raise (StuckTerm "Multiply"))
-	| TmDivide        (a, b) -> (match eval env a, eval env b with TmNum n, TmNum m -> TmNum(n / m)   | _ -> raise (StuckTerm "Divide"))
-	| TmModulo        (a, b) -> (match eval env a, eval env b with TmNum n, TmNum m -> TmNum(n mod m) | _ -> raise (StuckTerm "Modulo"))
-	| TmPlus          (a, b) -> (match eval env a, eval env b with TmNum n, TmNum m -> TmNum(n + m)   | _ -> raise (StuckTerm "Plus"))
-	| TmSubtract      (a, b) -> (match eval env a, eval env b with TmNum n, TmNum m -> TmNum(n - m)   | _ -> raise (StuckTerm "Subtract"))
+	| TermPower         (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(int_of_float (float_of_int n ** float_of_int m)) | _ -> raise (StuckTerm "Power"))
+	| TermMultiply      (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(n * m)   | _ -> raise (StuckTerm "Multiply"))
+	| TermDivide        (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(n / m)   | _ -> raise (StuckTerm "Divide"))
+	| TermModulo        (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(n mod m) | _ -> raise (StuckTerm "Modulo"))
+	| TermPlus          (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(n + m)   | _ -> raise (StuckTerm "Plus"))
+	| TermSubtract      (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(n - m)   | _ -> raise (StuckTerm "Subtract"))
 
-	| TmShiftLeft     (a, b) -> (match eval env a, eval env b with TmNum n, TmNum m -> TmNum(n lsl  m)  | _ -> raise (StuckTerm "Shift Left"))
-	| TmShiftRight    (a, b) -> (match eval env a, eval env b with TmNum n, TmNum m -> TmNum(n lsr  m)  | _ -> raise (StuckTerm "Shift Right"))
-	| TmBitwiseAnd    (a, b) -> (match eval env a, eval env b with TmNum n, TmNum m -> TmNum(n land m)  | _ -> raise (StuckTerm "Bitwise And"))
-	| TmBitwiseXOr    (a, b) -> (match eval env a, eval env b with TmNum n, TmNum m -> TmNum(n lxor m)  | _ -> raise (StuckTerm "Bitwise XOr"))
-	| TmBitwiseOr     (a, b) -> (match eval env a, eval env b with TmNum n, TmNum m -> TmNum(n lor  m)  | _ -> raise (StuckTerm "Bitwise Or"))
+	| TermShiftLeft     (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(n lsl  m)  | _ -> raise (StuckTerm "Shift Left"))
+	| TermShiftRight    (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(n lsr  m)  | _ -> raise (StuckTerm "Shift Right"))
+	| TermBitwiseAnd    (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(n land m)  | _ -> raise (StuckTerm "Bitwise And"))
+	| TermBitwiseXOr    (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(n lxor m)  | _ -> raise (StuckTerm "Bitwise XOr"))
+	| TermBitwiseOr     (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(n lor  m)  | _ -> raise (StuckTerm "Bitwise Or"))
 
-	| TmWhile         (p, a) -> (
+	| TermWhile         (p, a) -> (
 		let scope = extend env in (
 		try
-			while eval_equals (eval scope p) do (
+			while equality_test (eval scope p) do (
 				try
 					ignore (eval scope a)
 				with LoopContinue -> ()
-			) done; TmUnit
-		with LoopBreak -> TmUnit))
-	| TmDo            (p, a) -> (
+			) done; TermUnit
+		with LoopBreak -> TermUnit))
+	| TermDo            (p, a) -> (
 		let scope = extend env in (
 		ignore (eval scope a);
 		try
-			while eval_equals (eval scope p) do (
+			while equality_test (eval scope p) do (
 				try
 					ignore (eval scope a)
 				with LoopContinue -> ()
-			) done; TmUnit
-		with LoopBreak -> TmUnit))
-	| TmFor     (a, b, c, d) -> (
+			) done; TermUnit
+		with LoopBreak -> TermUnit))
+	| TermFor     (a, b, c, d) -> (
 		let scope = extend env in (
 		ignore (eval scope a);
 		try
-			while eval_equals (eval scope b) do (
+			while equality_test (eval scope b) do (
 				try
 					ignore (eval scope c);
 					ignore (eval scope d)
 				with LoopContinue -> ()
-			) done; TmUnit
-		with LoopBreak -> TmUnit))
-	| TmAssert (a)           -> (if not (eval_equals (eval env a)) then raise (AssertionFailed a); TmUnit)
-	| TmBreak                -> raise LoopBreak
-	| TmContinue             -> raise LoopContinue
+			) done; TermUnit
+		with LoopBreak -> TermUnit))
+	| TermAssert (a)           -> (if not (equality_test (eval env a)) then raise (AssertionFailed a); TermUnit)
+	| TermBreak                -> raise LoopBreak
+	| TermContinue             -> raise LoopContinue
 
-	| TmCons          (a, b) -> (match eval env a, eval env b with n, m -> TmPair(n, m))
-	| TmHead          (a)    -> (match eval env a with TmPair (n, m) -> n | _ -> raise (StuckTerm "Head"))
-	| TmTail          (a)    -> (match eval env a with TmPair (n, m) -> m | _ -> raise (StuckTerm "Tail"))
+	| TermCons          (a, b) -> (match eval env a, eval env b with n, m -> TermPair(n, m))
+	| TermHead          (a)    -> (match eval env a with TermPair (n, m) -> n | _ -> raise (StuckTerm "Head"))
+	| TermTail          (a)    -> (match eval env a with TermPair (n, m) -> m | _ -> raise (StuckTerm "Tail"))
 
-	| TmIf         (p, a, b) -> (let scope = extend env in match eval_equals (eval scope p) with
+	| TermIf         (p, a, b) -> (let scope = extend env in match equality_test (eval scope p) with
 		| false -> eval scope b
 		| true  -> eval scope a)
 
-	| TmLet (x, tT, a)         -> ignore (bind env x (eval env a)); TmUnit
-	| TmReBind (x,  a)      -> ignore (rebind env x (eval env a)); TmUnit
+	| TermBind (x, tT, a)         -> ignore (bind env x (eval env a)); TermUnit
+	| TermReBind (x,  a)      -> ignore (rebind env x (eval env a)); TermUnit
 
-	| TmUnit -> TmUnit
+	| TermUnit -> TermUnit
 	| _ -> raise (StuckTerm "Unknown")

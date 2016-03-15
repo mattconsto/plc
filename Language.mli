@@ -1,6 +1,10 @@
 open Types
 
+exception ParseError of string
+
+(* Parse a syntax *)
+val parse : string   -> aquaTerm
 (* Type check a tree *)
-val check : toyTerm -> toyType
+val check : aquaTerm -> aquaType
 (* Evaluate a tree *)
-val eval  : toyTerm -> toyTerm
+val eval  : aquaTerm -> aquaTerm

@@ -5,7 +5,8 @@ Parser.mli
 *.cmo
 *.cmi
 Parser.output
-mysplitinterpreter
+mysplinterpreter
 c
 TAGS
 *~
+_build

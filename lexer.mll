@@ -1,7 +1,5 @@
 {
 	open Parser
-	open String
-	open Str
 
 	exception SyntaxError of string
 }
@@ -20,8 +18,6 @@ rule lexer = parse
 	| "->"   | "→"                        { FUNTYPE }
 	| "\\l"  | "lambda" | "Lambda"        { LAMBDA }
 
-	| "let"       | "Let"                 { LET }
-	| "set"       | "Set"                 { SET }
 	| "in"        | "In"                  { IN }
 	| "if"        | "If"                  { IF }
 	| "then"      | "Then"                { THEN }
@@ -93,7 +89,7 @@ rule lexer = parse
 	| '-'?           ['0'-'9''_']+ as v
 	| '-'?'0'['b''B']['0'-'1''_']+ as v
 	| '-'?'0'['o''O']['0'-'7''_']+ as v
-	| '-'?'0'['x''X']['0'-'9''a'-'f''_']+ as v { INT (int_of_string (global_replace (regexp "_") "" v)) }
+	| '-'?'0'['x''X']['0'-'9''a'-'f''_']+ as v { INT (int_of_string (Str.global_replace (Str.regexp "_") "" v)) }
 	| '\'' [^ '\''] '\'' as v             { INT (Char.code v.[1])}
 	| '"'                                 { STRING ( read_string (Buffer.create 100) lexbuf ) }
 

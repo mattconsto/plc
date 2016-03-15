@@ -15,7 +15,7 @@
 %token ASSIGN_EQUAL ASSIGN_ADDITION ASSIGN_SUBTRACT ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MODULO ASSIGN_AND ASSIGN_XOR ASSIGN_OR
 
 %token TRUE FALSE
-%token LET SET IN IF THEN ELSE FUN MATCH WHILE DONE DO FOR BREAK CONTINUE ASSERT CONS HEAD TAIL PRINT TO_STRING READ
+%token IN IF THEN ELSE FUN MATCH WHILE DONE DO FOR BREAK CONTINUE ASSERT CONS HEAD TAIL PRINT TO_STRING READ
 
 %token LAMBDA ROUNDL ROUNDR ITYPE LTYPE FUNTYPE
 
@@ -29,7 +29,7 @@
 
 /* Low */
 %left FUNTYPE
-%left LET SET IN IF THEN ELSE FUN MATCH WHILE DONE DO FOR BREAK CONTINUE ASSERT CONS HEAD TAIL PRINT TO_STRING READ
+%left IN IF THEN ELSE FUN MATCH WHILE DONE DO FOR BREAK CONTINUE ASSERT CONS HEAD TAIL PRINT TO_STRING READ
 %left IDENT STRING
 %left TRUE FALSE
 %left ASSIGN_EQUAL ASSIGN_ADDITION ASSIGN_SUBTRACT ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MODULO ASSIGN_AND ASSIGN_XOR ASSIGN_OR
@@ -51,30 +51,30 @@
 %start parser
 
 /* Return Types */
-%type <Types.toyType> type_spec
-%type <Types.toyTerm> parser
+%type <Types.aquaType> type_spec
+%type <Types.aquaTerm> parser
 
 %%
 
 parser:
-	| exprs EOF                                        { TmCons ($1, TmUnit) }
-	| EOF                                              { TmUnit }
+	| exprs EOF                                        { TermCons ($1, TermUnit) }
+	| EOF                                              { TermUnit }
 ;
 
 type_spec:
-	| ITYPE                                            { ToyInt }
-	| LTYPE type_spec type_spec                        { ToyPair ($2, $3) }
-	| type_spec FUNTYPE type_spec                      { ToyFun ($1, $3) }
+	| ITYPE                                            { TypeInt }
+	| LTYPE type_spec type_spec                        { TypePair ($2, $3) }
+	| type_spec FUNTYPE type_spec                      { TypeFun ($1, $3) }
 ;
 
 exprs:
-	| expr exprs                                       { TmCons ($1, $2) }
+	| expr exprs                                       { TermCons ($1, $2) }
 	| expr                                             { $1 }
 ;
 
 expr:
-	| SEMI_COLON                                       { TmUnit }
-	| ROUNDL ROUNDR                                    { TmUnit }
+	| SEMI_COLON                                       { TermUnit }
+	| ROUNDL ROUNDR                                    { TermUnit }
 
 	| loop                                             { $1 }
 	| assign                                           { $1 }
@@ -84,14 +84,14 @@ expr:
 	| compare                                          { $1 }
 	| bitwise                                          { $1 }
 
-	| BREAK                                            { TmBreak }
-	| CONTINUE                                         { TmContinue }
-	| ASSERT expr                                      { TmAssert $2 }
-	| READ expr                                        { TmRead $2 }
-	| PRINT expr                                       { TmPrint $2 }
-	| TO_STRING expr                                   { TmToString $2 }
+	| BREAK                                            { TermBreak }
+	| CONTINUE                                         { TermContinue }
+	| ASSERT expr                                      { TermAssert $2 }
+	| READ expr                                        { TermRead $2 }
+	| PRINT expr                                       { TermPrint $2 }
+	| TO_STRING expr                                   { TermToString $2 }
 
-	| LAMBDA ROUNDL type_spec COLON IDENT ROUNDR expr  { TmAbs ($5, $3, $7) }
+	| LAMBDA ROUNDL type_spec COLON IDENT ROUNDR expr  { TermAbs ($5, $3, $7) }
 	| ROUNDL expr ROUNDR                               { $2 }
 	| CURLYL exprs CURLYR                              { $2 }
 
@@ -100,90 +100,90 @@ expr:
 ;
 
 data:
-	| FALSE                                            { TmNum 0 }
-	| TRUE                                             { TmUnaryNot (TmNum 0) } /* True = !False */
-	| INT                                              { TmNum $1 }
-	| IDENT                                            { TmVar $1 }
-	| STRING                                           { TmString $1 }
+	| FALSE                                            { TermNum 0 }
+	| TRUE                                             { TermUnaryNot (TermNum 0) } /* True = !False */
+	| INT                                              { TermNum $1 }
+	| IDENT                                            { TermVar $1 }
+	| STRING                                           { TermString $1 }
 ;
 
 list:
-	| SQUAREL SQUARER                                  { TmUnit }
-	| SQUAREL expr DOT expr SQUARER                    { TmCons ($2, $4) }
+	| SQUAREL SQUARER                                  { TermUnit }
+	| SQUAREL expr DOT expr SQUARER                    { TermCons ($2, $4) }
 	| SQUAREL list_inner SQUARER                       { $2 }
-	| CONS expr expr                                   { TmCons ($2, $3) }
-	| HEAD expr                                        { TmHead $2 }
-	| TAIL expr                                        { TmTail $2 }
+	| CONS expr expr                                   { TermCons ($2, $3) }
+	| HEAD expr                                        { TermHead $2 }
+	| TAIL expr                                        { TermTail $2 }
 ;
 
 list_inner:
-	| expr COMMA list_inner                            { TmCons ($1, $3)}
-	| expr COMMA                                       { TmCons ($1, TmUnit) }
-	| expr                                             { TmCons ($1, TmUnit) }
+	| expr COMMA list_inner                            { TermCons ($1, $3)}
+	| expr COMMA                                       { TermCons ($1, TermUnit) }
+	| expr                                             { TermCons ($1, TermUnit) }
 ;
 
 loop:
-	| WHILE expr DO expr                               { TmWhile ($2, $4) }
-	| DO expr WHILE expr                               { TmDo ($4, $2) }
-	| FOR assign SEMI_COLON expr SEMI_COLON expr THEN expr { TmFor ($2, $4, $6, $8)}
+	| WHILE expr DO expr                               { TermWhile ($2, $4) }
+	| DO expr WHILE expr                               { TermDo ($4, $2) }
+	| FOR assign SEMI_COLON expr SEMI_COLON expr THEN expr { TermFor ($2, $4, $6, $8)}
 ;
 
 assign:
-	| type_spec IDENT ASSIGN_EQUAL expr            { TmLet ($2, $1, $4) }
-	| type_spec IDENT ASSIGN_ADDITION expr         { TmLet ($2, $1, TmPlus ((TmVar $2), $4)) }
-	| type_spec IDENT ASSIGN_SUBTRACT expr         { TmLet ($2, $1, TmSubtract ((TmVar $2), $4)) }
-	| type_spec IDENT ASSIGN_MULTIPLY expr         { TmLet ($2, $1, TmMultiply ((TmVar $2), $4)) }
-	| type_spec IDENT ASSIGN_DIVIDE expr           { TmLet ($2, $1, TmDivide ((TmVar $2), $4)) }
-	| type_spec IDENT ASSIGN_MODULO expr           { TmLet ($2, $1, TmModulo ((TmVar $2), $4)) }
-	| type_spec IDENT ASSIGN_AND expr              { TmLet ($2, $1, TmBitwiseAnd ((TmVar $2), $4)) }
-	| type_spec IDENT ASSIGN_XOR expr              { TmLet ($2, $1, TmBitwiseXOr ((TmVar $2), $4)) }
-	| type_spec IDENT ASSIGN_OR expr               { TmLet ($2, $1, TmBitwiseOr ((TmVar $2), $4)) }
+	| type_spec IDENT ASSIGN_EQUAL expr            { TermBind ($2, $1, $4) }
+	| type_spec IDENT ASSIGN_ADDITION expr         { TermBind ($2, $1, TermPlus ((TermVar $2), $4)) }
+	| type_spec IDENT ASSIGN_SUBTRACT expr         { TermBind ($2, $1, TermSubtract ((TermVar $2), $4)) }
+	| type_spec IDENT ASSIGN_MULTIPLY expr         { TermBind ($2, $1, TermMultiply ((TermVar $2), $4)) }
+	| type_spec IDENT ASSIGN_DIVIDE expr           { TermBind ($2, $1, TermDivide ((TermVar $2), $4)) }
+	| type_spec IDENT ASSIGN_MODULO expr           { TermBind ($2, $1, TermModulo ((TermVar $2), $4)) }
+	| type_spec IDENT ASSIGN_AND expr              { TermBind ($2, $1, TermBitwiseAnd ((TermVar $2), $4)) }
+	| type_spec IDENT ASSIGN_XOR expr              { TermBind ($2, $1, TermBitwiseXOr ((TermVar $2), $4)) }
+	| type_spec IDENT ASSIGN_OR expr               { TermBind ($2, $1, TermBitwiseOr ((TermVar $2), $4)) }
 
-	| IDENT ASSIGN_EQUAL expr                      { TmReBind ($1, $3) }
-	| IDENT ASSIGN_ADDITION expr                   { TmReBind ($1, TmPlus ((TmVar $1), $3)) }
-	| IDENT ASSIGN_SUBTRACT expr                   { TmReBind ($1, TmSubtract ((TmVar $1), $3)) }
-	| IDENT ASSIGN_MULTIPLY expr                   { TmReBind ($1, TmMultiply ((TmVar $1), $3)) }
-	| IDENT ASSIGN_DIVIDE expr                     { TmReBind ($1, TmDivide ((TmVar $1), $3)) }
-	| IDENT ASSIGN_MODULO expr                     { TmReBind ($1, TmModulo ((TmVar $1), $3)) }
-	| IDENT ASSIGN_AND expr                        { TmReBind ($1, TmBitwiseAnd ((TmVar $1), $3)) }
-	| IDENT ASSIGN_XOR expr                        { TmReBind ($1, TmBitwiseXOr ((TmVar $1), $3)) }
-	| IDENT ASSIGN_OR expr                         { TmReBind ($1, TmBitwiseOr ((TmVar $1), $3)) }
+	| IDENT ASSIGN_EQUAL expr                      { TermReBind ($1, $3) }
+	| IDENT ASSIGN_ADDITION expr                   { TermReBind ($1, TermPlus ((TermVar $1), $3)) }
+	| IDENT ASSIGN_SUBTRACT expr                   { TermReBind ($1, TermSubtract ((TermVar $1), $3)) }
+	| IDENT ASSIGN_MULTIPLY expr                   { TermReBind ($1, TermMultiply ((TermVar $1), $3)) }
+	| IDENT ASSIGN_DIVIDE expr                     { TermReBind ($1, TermDivide ((TermVar $1), $3)) }
+	| IDENT ASSIGN_MODULO expr                     { TermReBind ($1, TermModulo ((TermVar $1), $3)) }
+	| IDENT ASSIGN_AND expr                        { TermReBind ($1, TermBitwiseAnd ((TermVar $1), $3)) }
+	| IDENT ASSIGN_XOR expr                        { TermReBind ($1, TermBitwiseXOr ((TermVar $1), $3)) }
+	| IDENT ASSIGN_OR expr                         { TermReBind ($1, TermBitwiseOr ((TermVar $1), $3)) }
 ;
 
 conditional:
-	| IF expr THEN expr ELSE expr                      { TmIf ($2, $4, $6) }
-	| expr QUESTION expr COLON expr                    { TmIf ($1, $3, $5) }
-	| expr QUESTION QUESTION expr                      { TmIf ($1, $1, $4) }
+	| IF expr THEN expr ELSE expr                      { TermIf ($2, $4, $6) }
+	| expr QUESTION expr COLON expr                    { TermIf ($1, $3, $5) }
+	| expr QUESTION QUESTION expr                      { TermIf ($1, $1, $4) }
 ;
 
 unary:
-	| UNARY_NEGATION expr                              { TmUnaryNot $2 }
-	| MINUS expr                                       { TmUnaryMinus $2 }
-	| PLUS expr                                        { TmUnaryPlus $2 }
+	| UNARY_NEGATION expr                              { TermUnaryNot $2 }
+	| MINUS expr                                       { TermUnaryMinus $2 }
+	| PLUS expr                                        { TermUnaryPlus $2 }
 ;
 
 binary:
-	| expr BINARY_POWER expr                           { TmPower ($1, $3) }
-	| expr BINARY_MULTIPLY expr                        { TmMultiply ($1, $3) }
-	| expr BINARY_DIVIDE expr                          { TmDivide ($1, $3) }
-	| expr BINARY_MODULO expr                          { TmModulo ($1, $3) }
-	| expr PLUS expr                                   { TmPlus ($1, $3) }
-	| expr MINUS expr                                  { TmSubtract ($1, $3) }
+	| expr BINARY_POWER expr                           { TermPower ($1, $3) }
+	| expr BINARY_MULTIPLY expr                        { TermMultiply ($1, $3) }
+	| expr BINARY_DIVIDE expr                          { TermDivide ($1, $3) }
+	| expr BINARY_MODULO expr                          { TermModulo ($1, $3) }
+	| expr PLUS expr                                   { TermPlus ($1, $3) }
+	| expr MINUS expr                                  { TermSubtract ($1, $3) }
 ;
 
 compare:
-	| expr COMPARE_LT expr                             { TmLessThan ($1, $3) }
-	| expr COMPARE_LTE expr                            { TmLessThanEqual($1, $3) }
-	| expr COMPARE_GT expr                             { TmMoreThan($1, $3) }
-	| expr COMPARE_GTE expr                            { TmMoreThanEqual($1, $3) }
-	| expr COMPARE_E expr                              { TmEqual($1, $3) }
-	| expr COMPARE_NE expr                             { TmNotEqual($1, $3) }
+	| expr COMPARE_LT expr                             { TermLessThan ($1, $3) }
+	| expr COMPARE_LTE expr                            { TermLessThanEqual($1, $3) }
+	| expr COMPARE_GT expr                             { TermMoreThan($1, $3) }
+	| expr COMPARE_GTE expr                            { TermMoreThanEqual($1, $3) }
+	| expr COMPARE_E expr                              { TermEqual($1, $3) }
+	| expr COMPARE_NE expr                             { TermNotEqual($1, $3) }
 ;
 
 bitwise:
-	| expr BITWISE_LEFT expr                           { TmShiftLeft($1, $3) }
-	| expr BITWISE_RIGHT expr                          { TmShiftRight($1, $3) }
-	| expr BITWISE_AND expr                            { TmBitwiseAnd($1, $3) }
-	| expr BITWISE_XOR expr                            { TmBitwiseXOr($1, $3) }
-	| expr BITWISE_OR expr                             { TmBitwiseOr($1, $3) }
+	| expr BITWISE_LEFT expr                           { TermShiftLeft($1, $3) }
+	| expr BITWISE_RIGHT expr                          { TermShiftRight($1, $3) }
+	| expr BITWISE_AND expr                            { TermBitwiseAnd($1, $3) }
+	| expr BITWISE_XOR expr                            { TermBitwiseXOr($1, $3) }
+	| expr BITWISE_OR expr                             { TermBitwiseOr($1, $3) }
 ;

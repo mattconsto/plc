@@ -2,40 +2,26 @@ open Types
 open Environment
 open Checker
 open Evaluator
-open Language
-open Lexer
-open Parser
-open Arg
-open Printf
-
-exception ParseError of string;;
-
-(* Parsing.set_trace true;; *)
-
-let parseProgram str = try
-	parser lexer (Lexing.from_string str)
-with Parsing.Parse_error -> raise (ParseError str);;
-
-let interactive = Array.length Sys.argv < 2;;
-if interactive then print_string "Interactive Mode:\n";;
+open Language;; (* ;; is required *)
 
 try
-	if interactive then (
+	if (Array.length Sys.argv) < 2 then (
+		print_string "Interactive Mode:\n";
 		while true do
 			try
 				print_string "> ";
-				let parsedProg = parseProgram (read_line ()) in (
+				let parsedProg = parse (read_line ()) in (
 				ignore (check parsedProg); (* Perform typechecking *)
 				print_string ((string_res (eval parsedProg)) ^ "\n"))
 			with
+				| EnvironmentReachedHead -> print_string "Variable not bound!\n"
 				| ParseError m           -> print_string ("Failed to parse: " ^ m ^ "\n")
-				| EnvironmentReachedHead -> print_string "Variable not found!\n"
-				| TypeError m            -> print_string ("Type error: " ^ m ^ "\n")
-				| UnboundVariableError m -> print_string ("Variable not bound: " ^ m ^ "\n")
-				| Terminated m           -> print_string ("Program Terminated: " ^ m ^ "\n")
+				| TypeError m            -> print_string ("Bad type: " ^ m ^ "\n")
 				| StuckTerm m            -> print_string ("Execution Stuck: " ^ m ^ "\n")
 				| NonBaseTypeResult      -> print_string "Non Base Type Result!\n"
 				| AssertionFailed m      -> print_string "Assertion Failed!\n"
+				| LoopBreak              -> print_string "Break statement outside of loop\n"
+				| LoopContinue           -> print_string "Continue statement outside of loop\n"
 		done
 	) else (
 		let load_file f =
@@ -44,10 +30,9 @@ try
 		  let s = Bytes.create n in
 		  really_input ic s 0 n;
 		  close_in ic;
-		  (s) in
-		let parsedProg = parseProgram (load_file Sys.argv.(1)) in
+		  s in
+		let parsedProg = parse (load_file Sys.argv.(1)) in
 		ignore (check parsedProg); (* Perform typechecking *)
 		ignore (eval parsedProg);
 	)
-with
-	| End_of_file -> if interactive then print_string "Exiting"; exit 0
+with End_of_file -> exit 0

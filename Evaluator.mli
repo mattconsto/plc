@@ -1,16 +1,14 @@
 open Types
 open Environment
 
-exception UnboundVariableError of string;;
-exception Terminated of string;;
-exception StuckTerm of string;;
-exception SubstitutionError;;
-exception NonBaseTypeResult;;
-exception AssertionFailed of toyTerm;;
-exception LoopBreak;;
-exception LoopContinue;;
+exception StuckTerm of string
+exception NonBaseTypeResult
 
-val eval : toyTerm environment -> toyTerm -> toyTerm
+exception AssertionFailed of aquaTerm
+exception LoopBreak
+exception LoopContinue
 
-val string_res : toyTerm -> string
-val string_res_string : toyTerm -> string
+val eval : aquaTerm environment -> aquaTerm -> aquaTerm
+
+val string_res : aquaTerm -> string
+val string_res_string : aquaTerm -> string

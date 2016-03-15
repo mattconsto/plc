@@ -1,52 +1,52 @@
-type toyType = ToyUnit | ToyInt | ToyPair of toyType * toyType | ToyFun of toyType * toyType
+type aquaType = TypeUnit | TypeInt | TypePair of aquaType * aquaType | TypeFun of aquaType * aquaType
 
 (* Grammar of the language *)
-type toyTerm =
-	| TmUnit
-	| TmNum of int
-	| TmPair of toyTerm * toyTerm
-	| TmString of string
+type aquaTerm =
+	| TermUnit
+	| TermNum of int
+	| TermPair of aquaTerm * aquaTerm
+	| TermString of string
 
-	| TmLessThan of toyTerm * toyTerm
-	| TmLessThanEqual of toyTerm * toyTerm
-	| TmMoreThan of toyTerm * toyTerm
-	| TmMoreThanEqual of toyTerm * toyTerm
-	| TmEqual of toyTerm * toyTerm
-	| TmNotEqual of toyTerm * toyTerm
+	| TermLessThan of aquaTerm * aquaTerm
+	| TermLessThanEqual of aquaTerm * aquaTerm
+	| TermMoreThan of aquaTerm * aquaTerm
+	| TermMoreThanEqual of aquaTerm * aquaTerm
+	| TermEqual of aquaTerm * aquaTerm
+	| TermNotEqual of aquaTerm * aquaTerm
 
-	| TmUnaryNot of toyTerm
-	| TmUnaryMinus of toyTerm
-	| TmUnaryPlus of toyTerm
+	| TermUnaryNot of aquaTerm
+	| TermUnaryMinus of aquaTerm
+	| TermUnaryPlus of aquaTerm
 
-	| TmPower of toyTerm * toyTerm
-	| TmMultiply of toyTerm * toyTerm
-	| TmDivide of toyTerm * toyTerm
-	| TmModulo of toyTerm * toyTerm
-	| TmPlus of toyTerm * toyTerm
-	| TmSubtract of toyTerm * toyTerm
+	| TermPower of aquaTerm * aquaTerm
+	| TermMultiply of aquaTerm * aquaTerm
+	| TermDivide of aquaTerm * aquaTerm
+	| TermModulo of aquaTerm * aquaTerm
+	| TermPlus of aquaTerm * aquaTerm
+	| TermSubtract of aquaTerm * aquaTerm
 
-	| TmShiftLeft of toyTerm * toyTerm
-	| TmShiftRight of toyTerm * toyTerm
-	| TmBitwiseAnd of toyTerm * toyTerm
-	| TmBitwiseXOr of toyTerm * toyTerm
-	| TmBitwiseOr of toyTerm * toyTerm
+	| TermShiftLeft of aquaTerm * aquaTerm
+	| TermShiftRight of aquaTerm * aquaTerm
+	| TermBitwiseAnd of aquaTerm * aquaTerm
+	| TermBitwiseXOr of aquaTerm * aquaTerm
+	| TermBitwiseOr of aquaTerm * aquaTerm
 
-	| TmWhile of toyTerm * toyTerm
-	| TmDo of toyTerm * toyTerm
-	| TmFor of toyTerm * toyTerm * toyTerm * toyTerm
-	| TmBreak
-	| TmContinue
-	| TmAssert of toyTerm
-	| TmRead of toyTerm
-	| TmPrint of toyTerm
-	| TmToString of toyTerm
+	| TermWhile of aquaTerm * aquaTerm
+	| TermDo of aquaTerm * aquaTerm
+	| TermFor of aquaTerm * aquaTerm * aquaTerm * aquaTerm
+	| TermBreak
+	| TermContinue
+	| TermAssert of aquaTerm
+	| TermRead of aquaTerm
+	| TermPrint of aquaTerm
+	| TermToString of aquaTerm
 
-	| TmCons of toyTerm * toyTerm
-	| TmHead of toyTerm
-	| TmTail of toyTerm
+	| TermCons of aquaTerm * aquaTerm
+	| TermHead of aquaTerm
+	| TermTail of aquaTerm
 
-	| TmVar of string
-	| TmIf of toyTerm * toyTerm * toyTerm
-	| TmLet of string * toyType * toyTerm
-	| TmReBind of string * toyTerm
-	| TmAbs of string * toyType * toyTerm
+	| TermVar of string
+	| TermIf of aquaTerm * aquaTerm * aquaTerm
+	| TermBind of string * aquaType * aquaTerm
+	| TermReBind of string * aquaTerm
+	| TermAbs of string * aquaType * aquaTerm

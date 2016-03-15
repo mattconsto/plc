@@ -2,7 +2,6 @@ open Types
 open Environment
 
 exception TypeError of string
-exception FreeError
 
 (* The type checking function itself *)
-val typeOf : toyType environment -> toyTerm -> toyType
+val typeOf : aquaType environment -> aquaTerm -> aquaType
