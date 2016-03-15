@@ -1,19 +1,26 @@
-Checker.cmi :
+Checker.cmi : Types.cmi Environment.cmi
 Environment.cmi :
-Toy.cmi : Types.cmi
+Evaluator.cmi : Types.cmi Environment.cmi
+Language.cmi : Types.cmi
 Types.cmi :
 parser.cmi : Types.cmi
 Checker.cmo : Types.cmi Environment.cmi Checker.cmi
 Checker.cmx : Types.cmx Environment.cmx Checker.cmi
 Environment.cmo : Environment.cmi
 Environment.cmx : Environment.cmi
-Toy.cmo : Types.cmi Environment.cmi Checker.cmi Toy.cmi
-Toy.cmx : Types.cmx Environment.cmx Checker.cmx Toy.cmi
+Evaluator.cmo : Types.cmi Environment.cmi Evaluator.cmi
+Evaluator.cmx : Types.cmx Environment.cmx Evaluator.cmi
+Language.cmo : Types.cmi Evaluator.cmi Environment.cmi Checker.cmi \
+    Language.cmi
+Language.cmx : Types.cmx Evaluator.cmx Environment.cmx Checker.cmx \
+    Language.cmi
 Types.cmo : Types.cmi
 Types.cmx : Types.cmi
 lexer.cmo : parser.cmi
 lexer.cmx : parser.cmx
-mysplinterpreter.cmo : Toy.cmi parser.cmi lexer.cmo Environment.cmi
-mysplinterpreter.cmx : Toy.cmx parser.cmx lexer.cmx Environment.cmx
-parser.cmo : Types.cmi Toy.cmi parser.cmi
-parser.cmx : Types.cmx Toy.cmx parser.cmi
+mysplinterpreter.cmo : Types.cmi parser.cmi lexer.cmo Language.cmi \
+    Evaluator.cmi Environment.cmi Checker.cmi
+mysplinterpreter.cmx : Types.cmx parser.cmx lexer.cmx Language.cmx \
+    Evaluator.cmx Environment.cmx Checker.cmx
+parser.cmo : Types.cmi parser.cmi
+parser.cmx : Types.cmx parser.cmi

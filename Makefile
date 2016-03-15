@@ -13,12 +13,12 @@
 
 # These are the object files needed to rebuild the mysplinterpreter executable file
 #
-OBJS = parser.cmo lexer.cmo Types.cmo Environment.cmo Checker.cmo Toy.cmo mysplinterpreter.cmo
+OBJS = Parser.cmo Lexer.cmo Types.cmo Environment.cmo Checker.cmo Evaluator.cmo Language.cmo mysplinterpreter.cmo
 
 COMMONOBJS = str.cma
 
 # Files that need to be generated from other files
-DEPEND += lexer.ml parser.ml
+DEPEND += Lexer.ml Parser.ml
 
 # Fix Makefile on Windows, not sure how it works
 ifeq ($(OS), Windows_NT)
@@ -45,13 +45,13 @@ mysplinterpreter: $(OBJS) mysplinterpreter.cmo
 %.cmo : %.ml
 	ocamlc -c $<
 
-# Generate ML files from a parser definition file
-parser.ml parser.mli: parser.mly
-	@rm -f parser.ml parser.mli
-	ocamlyacc -v parser.mly
-	@chmod -w parser.ml parser.mli
+# Generate ML files from a Parser definition file
+Parser.ml Parser.mli: Parser.mly
+	@rm -f Parser.ml Parser.mli
+	ocamlyacc -v Parser.mly
+	@chmod -w Parser.ml Parser.mli
 
-# Generate ML files from a lexer definition file
+# Generate ML files from a Lexer definition file
 %.ml %.mli: %.mll
 	@rm -f $@
 	ocamllex $<
@@ -59,7 +59,7 @@ parser.ml parser.mli: parser.mly
 
 # Clean up the directory
 clean::
-	rm -rf lexer.ml parser.ml parser.mli *.o *.cmo *.cmi parser.output c TAGS *~
+	rm -rf Lexer.ml Parser.ml Parser.mli *.o *.cmo *.cmi Parser.output c TAGS *~
 
 # Rebuild intermodule dependencies
 depend:: $(DEPEND)

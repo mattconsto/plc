@@ -1,10 +1,11 @@
-lexer.ml
-parser.ml
-parser.mli
+Lexer.ml
+Parser.ml
+Parser.mli
 *.o
 *.cmo
 *.cmi
-parser.output
+Parser.output
+mysplitinterpreter
 c
 TAGS
 *~

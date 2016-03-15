@@ -1,6 +1,5 @@
 %{
 	open Types
-	open Toy
 %}
 /* Keywords */
 %token <int> INT

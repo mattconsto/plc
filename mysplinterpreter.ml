@@ -1,7 +1,8 @@
 open Types
 open Environment
 open Checker
-open Toy
+open Evaluator
+open Language
 open Lexer
 open Parser
 open Arg
@@ -24,8 +25,8 @@ try
 			try
 				print_string "> ";
 				let parsedProg = parseProgram (read_line ()) in (
-				ignore (typeProg parsedProg); (* Perform typechecking *)
-				print_string ((string_res (evalProg parsedProg)) ^ "\n"))
+				ignore (check parsedProg); (* Perform typechecking *)
+				print_string ((string_res (eval parsedProg)) ^ "\n"))
 			with
 				| ParseError m           -> print_string ("Failed to parse: " ^ m ^ "\n")
 				| EnvironmentReachedHead -> print_string "Variable not found!\n"
@@ -45,8 +46,8 @@ try
 		  close_in ic;
 		  (s) in
 		let parsedProg = parseProgram (load_file Sys.argv.(1)) in
-		ignore (typeProg parsedProg); (* Perform typechecking *)
-		ignore (evalProg parsedProg);
+		ignore (check parsedProg); (* Perform typechecking *)
+		ignore (eval parsedProg);
 	)
 with
 	| End_of_file -> if interactive then print_string "Exiting"; exit 0
