@@ -3,7 +3,7 @@ open Environment
 
 exception Terminated of aquaTerm
 exception StuckTerm of string
-exception NonBaseTypeResult
+exception NonBaseTypeResult of aquaTerm
 
 exception AssertionFailed of aquaTerm
 exception LoopBreak

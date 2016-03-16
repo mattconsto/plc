@@ -4,7 +4,7 @@ open Environment
 exception TypeError of string;;
 
 (* The type checking function itself *)
-let rec typeOf env e = match e with
+let rec typeOf env e = flush_all(); match e with
 	(* data *)
 	| TermUnit        -> TypeUnit
 	| TermNum       n -> TypeNum
@@ -39,7 +39,7 @@ let rec typeOf env e = match e with
 		| TypeNum, TypeNum -> TypeNum
 		| _ -> raise (TypeError "Binary Operation"))
 
-	| TermScope a -> ignore (typeOf (extend env) a); TypeUnit
+	| TermScope a -> typeOf (extend env) a
 
 	| TermWhile (a, b) | TermDo (a, b) -> let scope = extend env in (ignore (typeOf scope a); ignore (typeOf scope b)); TypeUnit
 	| TermFor(a, b, c, d) -> let scope = extend env in (ignore (typeOf scope a); ignore (typeOf scope b); ignore (typeOf scope c); ignore (typeOf scope d)); TypeUnit
@@ -59,7 +59,7 @@ let rec typeOf env e = match e with
 
 	| TermBind (x, t, e) -> (match ((typeOf env e) = t) with
 		| true -> ignore (bind env x t); t
-		| false -> raise (TypeError "Let"))
+		| false -> raise (TypeError ("while binding " ^ x)))
 
 	| TermReBind (x, e) -> (match ((typeOf env e) = (lookup env x)) with
 		| true  -> typeOf env e

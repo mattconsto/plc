@@ -16,7 +16,7 @@ let eval output error input ele = eval output error input global_values ele
 (* Do everything *)
 let run output error input str = try
   let ele = parse str in (
-  ignore (check ele);
+  (* ignore (check ele); *)
   eval output error input ele)
 with
   | EnvironmentReachedHead -> Printf.fprintf error "Eval: Variable not bound!\n"; TermUnit
@@ -26,7 +26,7 @@ with
   | End_of_file            -> TermUnit
   | Terminated m           -> m
   | StuckTerm m            -> Printf.fprintf error "Eval: Execution Stuck %s\n" m; TermUnit
-  | NonBaseTypeResult      -> Printf.fprintf error "Eval: Non Base Type Result!\n"; TermUnit
+  | NonBaseTypeResult m    -> Printf.fprintf error "Eval: Non Base Type Result %s\n" (term_to_string m); TermUnit
   | AssertionFailed m      -> Printf.fprintf error "Eval: Assertion Failed %s\n" (result_to_bool m); TermUnit
   | LoopBreak              -> Printf.fprintf error "Eval: Break statement outside of loop\n"; TermUnit
   | LoopContinue           -> Printf.fprintf error "Eval: Continue statement outside of loop\n"; TermUnit
