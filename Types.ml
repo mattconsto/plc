@@ -34,12 +34,21 @@ type aquaTerm =
 	| TermWhile of aquaTerm * aquaTerm
 	| TermDo of aquaTerm * aquaTerm
 	| TermFor of aquaTerm * aquaTerm * aquaTerm * aquaTerm
+
 	| TermBreak
 	| TermContinue
 	| TermAssert of aquaTerm
-	| TermRead of aquaTerm
-	| TermPrint of aquaTerm
-	| TermToString of aquaTerm
+	| TermExit of aquaTerm
+
+	| TermReadInt
+	| TermReadString
+	| TermReadBool
+
+	| TermPrintInt of aquaTerm
+	| TermPrintString of aquaTerm
+	| TermPrintBool of aquaTerm
+
+	| TermRandom of aquaTerm * aquaTerm
 
 	| TermCons of aquaTerm * aquaTerm
 	| TermHead of aquaTerm

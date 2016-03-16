@@ -12,10 +12,12 @@ let rec typeOf env e = match e with
 	| TermVar       x -> (try lookup env x with EnvironmentReachedHead -> raise (TypeError ("Variable: " ^ x)))
 	| TermString    s -> TypePair (TypeInt, TypeInt)
 
-	| TermRead e -> (match e with
-		| TermNum n -> (let rec build n = if n = 0 then TypeUnit else TypePair(TypeInt, build (n-1)) in build n)
-		| _       -> raise (TypeError "Read"))
-	| TermToString a | TermPrint a -> TypeUnit
+	| TermReadInt     -> TypeInt
+	| TermReadString  -> TypeInt
+	| TermReadBool    -> TypeInt
+	| TermPrintString a | TermPrintInt a | TermPrintBool a -> TypeUnit
+
+	| TermRandom (a, b) -> TypeInt
 
 	| TermLessThan (a, b) | TermLessThanEqual (a, b) | TermMoreThan (a, b) | TermMoreThanEqual (a, b) | TermEqual (a, b) | TermNotEqual (a, b)
 	-> (match (typeOf env a), (typeOf env b) with
@@ -41,6 +43,7 @@ let rec typeOf env e = match e with
 	| TermAssert a -> TypeUnit
 	| TermBreak -> TypeUnit
 	| TermContinue -> TypeUnit
+	| TermExit a -> TypeUnit
 
 	| TermCons (a, b) -> (match typeOf env a, typeOf env b with n, m -> TypePair (n, m))
 	| TermHead a -> (match typeOf env a with TypePair(j, k) -> j | _ -> raise (TypeError "Head"))

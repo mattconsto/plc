@@ -15,7 +15,7 @@
 %token ASSIGN_EQUAL ASSIGN_ADDITION ASSIGN_SUBTRACT ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MODULO ASSIGN_AND ASSIGN_XOR ASSIGN_OR
 
 %token TRUE FALSE
-%token IN IF THEN ELSE FUN MATCH WHILE DONE DO FOR BREAK CONTINUE ASSERT CONS HEAD TAIL PRINT TO_STRING READ
+%token IN IF THEN ELSE FUN MATCH WHILE DONE DO FOR BREAK CONTINUE ASSERT EXIT CONS HEAD TAIL PRINT_INT PRINT_STRING PRINT_BOOL READ_INT READ_STRING READ_BOOL RANDOM
 
 %token LAMBDA ROUNDL ROUNDR ITYPE LTYPE FUNTYPE
 
@@ -29,7 +29,7 @@
 
 /* Low */
 %left FUNTYPE
-%left IN IF THEN ELSE FUN MATCH WHILE DONE DO FOR BREAK CONTINUE ASSERT CONS HEAD TAIL PRINT TO_STRING READ
+%left IN IF THEN ELSE FUN MATCH WHILE DONE DO FOR BREAK CONTINUE ASSERT EXIT CONS HEAD TAIL PRINT_INT PRINT_STRING PRINT_BOOL READ_INT READ_STRING READ_BOOL RANDOM
 %left IDENT STRING
 %left TRUE FALSE
 %left ASSIGN_EQUAL ASSIGN_ADDITION ASSIGN_SUBTRACT ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MODULO ASSIGN_AND ASSIGN_XOR ASSIGN_OR
@@ -40,8 +40,8 @@
 %left COMPARE_E COMPARE_NE
 %left COMPARE_LT COMPARE_LTE COMPARE_GT COMPARE_GTE
 %left BITWISE_LEFT BITWISE_RIGHT
-%left BINARY_POWER BINARY_MULTIPLY BINARY_DIVIDE BINARY_MODULO
 %left UNARY_NEGATION MINUS PLUS
+%left BINARY_POWER BINARY_MULTIPLY BINARY_DIVIDE BINARY_MODULO
 %left SQUAREL SQUARER
 %left ROUNDL ROUNDR
 %left CURLYL CURLYR
@@ -83,13 +83,12 @@ expr:
 	| binary                                           { $1 }
 	| compare                                          { $1 }
 	| bitwise                                          { $1 }
+	| io                                               { $1 }
 
 	| BREAK                                            { TermBreak }
 	| CONTINUE                                         { TermContinue }
 	| ASSERT expr                                      { TermAssert $2 }
-	| READ expr                                        { TermRead $2 }
-	| PRINT expr                                       { TermPrint $2 }
-	| TO_STRING expr                                   { TermToString $2 }
+	| EXIT expr                                        { TermExit $2 }
 
 	| LAMBDA ROUNDL type_spec IDENT ROUNDR expr        { TermLambda ($4, $3, $6) }
 	| expr ROUNDL expr ROUNDR                          { TermApply ($1, $3) }
@@ -187,4 +186,18 @@ bitwise:
 	| expr BITWISE_AND expr                            { TermBitwiseAnd($1, $3) }
 	| expr BITWISE_XOR expr                            { TermBitwiseXOr($1, $3) }
 	| expr BITWISE_OR expr                             { TermBitwiseOr($1, $3) }
+;
+
+io:
+	| READ_INT                                         { TermReadInt }
+	| READ_STRING                                      { TermReadString }
+	| READ_BOOL                                        { TermReadBool }
+
+	| PRINT_INT expr                                   { TermPrintInt $2 }
+	| PRINT_STRING expr                                { TermPrintString $2 }
+	| PRINT_BOOL expr                                  { TermPrintBool $2 }
+
+	| RANDOM expr expr                                 { TermRandom ($2, $3) }
+	| RANDOM expr                                      { TermRandom (TermNum 0, $2) }
+	| RANDOM                                           { TermRandom (TermNum 0, TermNum 1) }
 ;

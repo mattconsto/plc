@@ -31,12 +31,20 @@ rule lexer = parse
 	| "break"     | "Break"               { BREAK }
 	| "continue"  | "Continue"            { CONTINUE }
 	| "assert"    | "Assert"              { ASSERT }
+	| "exit"      | "Exit"                { EXIT }
 	| "cons"      | "Cons"                { CONS }
 	| "head"      | "Head"                { HEAD }
 	| "tail"      | "Tail"                { TAIL }
-	| "string"    | "String"              { TO_STRING }
-	| "print"     | "Print"               { PRINT }
-	| "read"      | "Read"                { READ }
+
+	| "random"    | "Random"              { RANDOM }
+
+	| "read_int"     | "Read_Int"         { READ_INT }
+	| "read_string"  | "Read_String"      { READ_STRING }
+	| "read_bool"    | "Read_Bool"        { READ_BOOL }
+
+	| "print_int"    | "Print_Int"        { PRINT_INT }
+	| "print_string" | "Print_String"     { PRINT_STRING }
+	| "print_bool"   | "Print_Bool"       { PRINT_BOOL }
 
 	(* Brackets *)
 	| '{'                                 { CURLYL }

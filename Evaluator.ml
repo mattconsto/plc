@@ -1,6 +1,7 @@
 open Types
 open Environment
 
+exception Terminated of aquaTerm
 exception StuckTerm of string
 exception NonBaseTypeResult
 
@@ -8,22 +9,31 @@ exception AssertionFailed of aquaTerm
 exception LoopBreak
 exception LoopContinue
 
-let rec string_res res = match res with
+let rec result_to_int res = match res with
 	| TermUnit        -> "[]"
 	| TermNum i       -> Printf.sprintf "%i" i
 	| TermPair(a, b) -> (match b with
-		| TermUnit -> (string_res a)
-		| _      -> (string_res a) ^ " " ^ (string_res b))
+		| TermUnit -> (result_to_int a)
+		| _      -> (result_to_int a) ^ " " ^ (result_to_int b))
 	| TermLambda(x, t, a) -> Printf.sprintf "lambda (%s)" x
 	| _ -> raise NonBaseTypeResult
 
-let rec string_res_string res = match res with
+let rec result_to_string res = match res with
 	| TermUnit        -> ""
 	| TermNum i       -> String.make 1 (Char.chr i)
 	| TermPair(a, b) -> (match b with
-		| TermUnit -> (string_res_string a)
-		| _      -> (string_res_string a) ^ (string_res_string b))
-	| TermLambda(x, t, a) -> Printf.sprintf "lambda (%s)" x 
+		| TermUnit -> (result_to_string a)
+		| _      -> (result_to_string a) ^ (result_to_string b))
+	| TermLambda(x, t, a) -> Printf.sprintf "lambda (%s)" x
+	| _ -> raise NonBaseTypeResult
+
+let rec result_to_bool res = match res with
+	| TermUnit        -> "[]"
+	| TermNum i       -> if i != 0 then "true" else "false"
+	| TermPair(a, b) -> (match b with
+		| TermUnit -> (result_to_bool a)
+		| _      -> (result_to_bool a) ^ " " ^ (result_to_bool b))
+	| TermLambda(x, t, a) -> Printf.sprintf "lambda (%s)" x
 	| _ -> raise NonBaseTypeResult
 
 let equality_test e = (match e with
@@ -34,12 +44,22 @@ let equality_test e = (match e with
 	| _ -> raise (StuckTerm "If"))
 
 (* Read lines, caching the numbers found *)
-let read_number_cache = ref [];;
+let read_line_cache = ref [];;
 let read_number = fun () -> (
-	while !read_number_cache = [] do ignore (read_number_cache := Str.split (Str.regexp " ") (read_line ())) done;
-	match !read_number_cache with
-		| (head :: tail) -> (read_number_cache := tail; int_of_string head)
+	while !read_line_cache = [] do ignore (read_line_cache := Str.split (Str.regexp " ") (read_line ())) done;
+	match !read_line_cache with
+		| (head :: tail) -> (read_line_cache := tail; int_of_string head)
 		| [] -> raise NonBaseTypeResult);;
+
+let read_bool = fun () -> (
+	while !read_line_cache = [] do ignore (read_line_cache := Str.split (Str.regexp " ") (read_line ())) done;
+	match !read_line_cache with
+		| (head :: tail) -> (read_line_cache := tail; match String.lowercase head with
+			| "true" | "t" | "yes" | "y" | "1" -> true
+			| _ -> false)
+		| [] -> raise NonBaseTypeResult);;
+
+Random.self_init();;
 
 (* bigEval *)
 let rec eval env e = match e with
@@ -50,12 +70,15 @@ let rec eval env e = match e with
 		let rec exp i l = if i < 0 then l else exp (i - 1) (TermCons (TermNum (Char.code s.[i]), l)) in
 		exp (String.length s - 1) TermUnit)
 
-	| TermRead n -> (match n with
-		| TermNum a -> (let rec build a = if a = 0 then TermUnit else let left = read_number () and right = build (a-1) in TermPair(TermNum left, right) in build a)
-		| _       -> raise (StuckTerm "Read"))
+	| TermReadInt -> TermNum (read_number ())
+	| TermReadString -> TermNum 0
+	| TermReadBool -> if read_bool () then (eval env (TermUnaryNot (TermNum 0))) else TermNum 0
 
-	| TermPrint a              -> print_string (string_res (eval env a) ^ "\n"); TermUnit
-	| TermToString a             -> print_string (string_res_string (eval env a) ^ "\n"); TermUnit
+	| TermPrintInt a              -> print_string (result_to_int (eval env a) ^ "\n"); TermUnit
+	| TermPrintString a             -> print_string (result_to_string (eval env a) ^ "\n"); TermUnit
+	| TermPrintBool a            -> print_string (result_to_bool (eval env a) ^ "\n"); TermUnit
+
+	| TermRandom (TermNum min, TermNum max) -> TermNum (Random.int((max - min) + 1) + min)
 
 	| TermLessThan      (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(if n <  m then 1 else 0)  | _ -> raise (StuckTerm "Less than"))
 	| TermLessThanEqual (a, b) -> (match eval env a, eval env b with TermNum n, TermNum m -> TermNum(if n <= m then 1 else 0)  | _ -> raise (StuckTerm "Less than Equal"))
@@ -114,6 +137,7 @@ let rec eval env e = match e with
 	| TermAssert (a)           -> (if not (equality_test (eval env a)) then raise (AssertionFailed a); TermUnit)
 	| TermBreak                -> raise LoopBreak
 	| TermContinue             -> raise LoopContinue
+	| TermExit a               -> raise (Terminated (eval env a))
 
 	| TermCons          (a, b) -> (match eval env a, eval env b with n, m -> TermPair(n, m))
 	| TermHead          (a)    -> (match eval env a with TermPair (n, m) -> n | _ -> raise (StuckTerm "Head"))

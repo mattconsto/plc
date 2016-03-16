@@ -1,6 +1,4 @@
-print 0;
+print_int 0;
 
 /* Lets print what we read, forever! */
-while true do {
-	print read 1;
-}
+while true do print_int read_int;
