@@ -70,7 +70,8 @@ type_spec:
 	| ROUNDL type_spec ROUNDR                          { $2 }
 
 exprs:
-	| expr exprs                                       { TermConsLast ($1, $2) }
+	| expr SEMI_COLON exprs                            { TermConsLast ($1, $3) }
+	| expr SEMI_COLON                                  { $1 }
 	| expr                                             { $1 }
 
 expr:
@@ -101,8 +102,6 @@ expr:
 	| list                                             { $1 }
 	| data                                             { $1 }
 
-	| corrections                                      { $1 }
-
 data:
 	| FALSE                                            { TermNum 0 }
 	| TRUE                                             { TermUnaryNot (TermNum 0) } /* True = !False */
@@ -117,7 +116,7 @@ list:
 	| CONS expr expr                                   { TermCons ($2, $3) }
 	| HEAD expr                                        { TermHead $2 }
 	| TAIL expr                                        { TermTail $2 }
-	| LENGTH expr																			 { TermLength $2 }
+	| LENGTH expr                                      { TermLength $2 }
 
 list_inner:
 	| expr COMMA list_inner                            { TermCons ($1, $3)}
@@ -131,14 +130,6 @@ loop:
 
 assign:
 	| type_spec IDENT ASSIGN_EQUAL expr            { TermBind ($2, $1, $4) }
-	| type_spec IDENT ASSIGN_ADDITION expr         { TermBind ($2, $1, TermPlus ((TermVar $2), $4)) }
-	| type_spec IDENT ASSIGN_SUBTRACT expr         { TermBind ($2, $1, TermSubtract ((TermVar $2), $4)) }
-	| type_spec IDENT ASSIGN_MULTIPLY expr         { TermBind ($2, $1, TermMultiply ((TermVar $2), $4)) }
-	| type_spec IDENT ASSIGN_DIVIDE expr           { TermBind ($2, $1, TermDivide ((TermVar $2), $4)) }
-	| type_spec IDENT ASSIGN_MODULO expr           { TermBind ($2, $1, TermModulo ((TermVar $2), $4)) }
-	| type_spec IDENT ASSIGN_AND expr              { TermBind ($2, $1, TermBitwiseAnd ((TermVar $2), $4)) }
-	| type_spec IDENT ASSIGN_XOR expr              { TermBind ($2, $1, TermBitwiseXOr ((TermVar $2), $4)) }
-	| type_spec IDENT ASSIGN_OR expr               { TermBind ($2, $1, TermBitwiseOr ((TermVar $2), $4)) }
 
 	| IDENT ASSIGN_EQUAL expr                      { TermReBind ($1, $3) }
 	| IDENT ASSIGN_ADDITION expr                   { TermReBind ($1, TermPlus ((TermVar $1), $3)) }
@@ -200,21 +191,3 @@ io:
 	| RANDOM expr expr                                 { TermRandom ($2, $3) }
 	| RANDOM expr                                      { TermRandom (TermNum 0, $2) }
 	| RANDOM                                           { TermRandom (TermNum 0, TermNum 1) }
-
-corrections:
-	| ASSERT                                           { TermPrintString (TermString "Usage: assert <expr>\n") }
-	| LAMBDA                                           { TermPrintString (TermString "Usage: lambda ( <type> <ident> ) <expr>\n") }
-	| CONS                                             { TermPrintString (TermString "Usage: cons <expr> <expr>\n") }
-	| HEAD                                             { TermPrintString (TermString "Usage: head <expr>\n") }
-	| WHILE                                            { TermPrintString (TermString "Usage: while <expr> do <expr>\n") }
-	| DO                                               { TermPrintString (TermString "Usage: do <expr> while <expr>\n") }
-	| FOR                                              { TermPrintString (TermString "Usage: for <assign> ; <expr> ; <expr> then <expr>\n") }
-	| IF                                               { TermPrintString (TermString "Usage: if <expr> then <expr> [ else <expr> ] done\n") }
-	| THEN                                             { TermPrintString (TermString "Usage: if <expr> then <expr> [ else <expr> ] done\nUsage: for <assign> ; <expr> ; <expr> then <expr>\n") }
-	| ELSE                                             { TermPrintString (TermString "Usage: if <expr> then <expr> [ else <expr> ] done\n") }
-	| PRINT_INT                                        { TermPrintString (TermString "Usage: print_int <expr>\n") }
-	| PRINT_STRING                                     { TermPrintString (TermString "Usage: print_string <expr>\n") }
-	| PRINT_BOOL                                       { TermPrintString (TermString "Usage: print_bool <expr>\n") }
-	| PRINT_INT                                        { TermPrintString (TermString "Usage: println_int <expr>\n") }
-	| PRINT_STRING                                     { TermPrintString (TermString "Usage: println_string <expr>\n") }
-	| PRINT_BOOL                                       { TermPrintString (TermString "Usage: println_bool <expr>\n") }

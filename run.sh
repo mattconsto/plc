@@ -1,14 +1,14 @@
-echo -e "Program 1:\n"
-./mysplinterpreter code/pr1.spl < code/pr1.txt
+echo -en "P1 : "
+./mysplinterpreter code/pr1.spl < code/pr1.txt | tr '\n' ', ' | sed 's/.$//'
 
-echo -e "\nProgram 2:\n"
-./mysplinterpreter code/pr2.spl < code/pr2.txt
+echo -en "\nP2 : "
+./mysplinterpreter code/pr2.spl < code/pr2.txt | tr '\n' ', ' | sed 's/.$//'
 
-echo -e "\nProgram 3:\n"
-./mysplinterpreter code/pr3.spl < code/pr3.txt
+echo -en "\nP3 : "
+./mysplinterpreter code/pr3.spl < code/pr3.txt | tr '\n' ', ' | sed 's/.$//'
 
-echo -e "\nProgram 4:\n"
-./mysplinterpreter code/pr4.spl < code/pr4.txt
+echo -en "\nP4 : "
+./mysplinterpreter code/pr4.spl < code/pr4.txt | tr '\n' ', ' | sed 's/.$//'
 
-echo -e "\nProgram 5:\n"
-./mysplinterpreter code/pr5.spl < code/pr5.txt
+echo -en "\nP5 : "
+./mysplinterpreter code/pr5.spl < code/pr5.txt | tr '\n' ', ' | sed 's/.$//'

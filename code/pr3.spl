@@ -1,1 +1,10 @@
-while true do println_int read_int + 3 * read_int;
+/*
+	Problem 3: Stream Arithmetic
+
+	Take two sequences a_1, a_2, a_3, ... and b_1, b_2, b_3, ... and produce then
+	sequence: a_1 + 3b_1   a_2 + 3b_2   a_3 + 3b_3
+*/
+
+while true do {
+	println_int read_int + 3 * read_int;
+}

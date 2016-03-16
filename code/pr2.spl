@@ -1,4 +1,12 @@
+/*
+	Problem 2: Copying
+
+	Take a sequence a_1, a_2, a_3, ... as an input and output two copies of it
+
+	This is achieved by reading, caching, building a list then outputing it.
+ */
+
 while true do {
-	int num = read_int;
-	println_int [num, num];
+	int cache = read_int;
+	println_int [cache, cache];
 }
