@@ -1,6 +1,13 @@
-int total = 0
+/*
+	Problem 4: Accumulator
+
+	Take a sequence a_1, a_2, a_3, .. and output the sequence where each term is
+	the sum of all the terms up to that point:
+	a_1   a_1 + a_2   a_1 + a_2 + a_3
+*/
+
+int total = 0;
 
 while true do {
-  total += read_int;
-  println_int total;
+	println_int (total += read_int);
 }

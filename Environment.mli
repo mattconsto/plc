@@ -2,7 +2,7 @@
 exception EnvironmentReachedHead
 
 (* Type of Environments *)
-type 'a environment = Env of 'a environment * (string * 'a) list ref | Head
+type 'a environment = Env of 'a environment * (string * 'a ref) list ref | Head
 
 (* Function to look up the type of a string name variable in a type environment *)
 val lookup : 'a environment -> string -> 'a
