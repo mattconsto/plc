@@ -49,4 +49,5 @@ type aquaTerm =
 	| TermIf of aquaTerm * aquaTerm * aquaTerm
 	| TermBind of string * aquaType * aquaTerm
 	| TermReBind of string * aquaTerm
-	| TermAbs of string * aquaType * aquaTerm
+	| TermLambda of string * aquaType * aquaTerm
+	| TermApply of aquaTerm * aquaTerm

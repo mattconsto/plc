@@ -91,7 +91,8 @@ expr:
 	| PRINT expr                                       { TermPrint $2 }
 	| TO_STRING expr                                   { TermToString $2 }
 
-	| LAMBDA ROUNDL type_spec COLON IDENT ROUNDR expr  { TermAbs ($5, $3, $7) }
+	| LAMBDA ROUNDL type_spec IDENT ROUNDR expr        { TermLambda ($4, $3, $6) }
+	| expr ROUNDL expr ROUNDR                          { TermApply ($1, $3) }
 	| ROUNDL expr ROUNDR                               { $2 }
 	| CURLYL exprs CURLYR                              { $2 }
 

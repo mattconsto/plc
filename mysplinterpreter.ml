@@ -17,11 +17,13 @@ try
 				| EnvironmentReachedHead -> print_string "Variable not bound!\n"
 				| ParseError m           -> print_string ("Failed to parse: " ^ m ^ "\n")
 				| TypeError m            -> print_string ("Bad type: " ^ m ^ "\n")
+				| Failure m              -> print_string ("Failure: " ^ m ^ "\n")
 				| StuckTerm m            -> print_string ("Execution Stuck: " ^ m ^ "\n")
 				| NonBaseTypeResult      -> print_string "Non Base Type Result!\n"
 				| AssertionFailed m      -> print_string "Assertion Failed!\n"
 				| LoopBreak              -> print_string "Break statement outside of loop\n"
 				| LoopContinue           -> print_string "Continue statement outside of loop\n"
+				| _                      -> print_string "Unknown Exception!\n"
 		done
 	) else (
 		let load_file f =

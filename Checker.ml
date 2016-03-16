@@ -54,7 +54,15 @@ let rec typeOf env e = match e with
 		| false -> raise (TypeError "Let"))
 
 	| TermReBind (x, e) -> (match ((typeOf env e) = (lookup env x)) with
-		| true  ->  TypeUnit
+		| true  -> TypeUnit
 		| false -> raise (TypeError "Rebind"))
 
-	| TermAbs (x, t, e) -> ignore (bind env x t); TypeFun(t, typeOf env e)
+	| TermLambda (x, t, e) -> TypeFun(t, typeOf (bind env x t) e)
+
+	| TermApply (a, b) -> (	match typeOf env a with
+		| TypeFun (tT, tU) -> (
+ 			match tT = typeOf env b with
+				| true -> tT
+				| false -> raise (TypeError "Apply")
+				)
+		| _ -> raise (TypeError "Apply"))

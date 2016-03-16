@@ -14,6 +14,7 @@ let rec string_res res = match res with
 	| TermPair(a, b) -> (match b with
 		| TermUnit -> (string_res a)
 		| _      -> (string_res a) ^ " " ^ (string_res b))
+	| TermLambda(x, t, a) -> Printf.sprintf "lambda (%s)" x
 	| _ -> raise NonBaseTypeResult
 
 let rec string_res_string res = match res with
@@ -22,6 +23,7 @@ let rec string_res_string res = match res with
 	| TermPair(a, b) -> (match b with
 		| TermUnit -> (string_res_string a)
 		| _      -> (string_res_string a) ^ (string_res_string b))
+	| TermLambda(x, t, a) -> Printf.sprintf "lambda (%s)" x 
 	| _ -> raise NonBaseTypeResult
 
 let equality_test e = (match e with
@@ -34,7 +36,7 @@ let equality_test e = (match e with
 (* Read lines, caching the numbers found *)
 let read_number_cache = ref [];;
 let read_number = fun () -> (
-	if !read_number_cache = [] then	ignore (read_number_cache := Str.split (Str.regexp " ") (read_line ()));
+	while !read_number_cache = [] do ignore (read_number_cache := Str.split (Str.regexp " ") (read_line ())) done;
 	match !read_number_cache with
 		| (head :: tail) -> (read_number_cache := tail; int_of_string head)
 		| [] -> raise NonBaseTypeResult);;
@@ -123,6 +125,10 @@ let rec eval env e = match e with
 
 	| TermBind (x, tT, a)         -> ignore (bind env x (eval env a)); TermUnit
 	| TermReBind (x,  a)      -> ignore (rebind env x (eval env a)); TermUnit
+
+  | TermApply (TermLambda(x, t, a), b) -> let scope = extend env in (ignore (bind scope x b); eval scope a)
+
+	| TermLambda(x, t, a) -> TermLambda(x, t, a)
 
 	| TermUnit -> TermUnit
 	| _ -> raise (StuckTerm "Unknown")
