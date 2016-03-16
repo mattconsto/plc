@@ -40,7 +40,7 @@ rule lexer = parse
 	| "cons"      | "Cons"                { CONS }
 	| "head"      | "Head"                { HEAD }
 	| "tail"      | "Tail"                { TAIL }
-	| "length"		| "Length"							{ LENGTH }
+	| "#"																	{ LENGTH }
 
 	| "random"    | "Random"              { RANDOM }
 

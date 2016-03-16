@@ -156,9 +156,8 @@ let rec eval output error input env e = flush_all (); match e with
 	| TermTail          (a)    -> (match eval output error input env a with TermPair (n, m) -> m | _ -> raise (StuckTerm "Tail"))
 	| TermLength 				(a)		 -> (let rec length num l = match l with
 																	| TermPair (n, m) -> length (num + 1) m
-																	| TermNum	i			-> num + 1
 																	| TermUnit				-> num
-																	| _								-> print_string "boo" ; raise (StuckTerm "Length") in
+																	| _								-> raise (StuckTerm "Length") in
 																TermNum (length 0 (eval output error input env a)))
 
 	| TermIf         (p, a, b) -> (let scope = extend env in match equality_test (eval output error input scope p) with
