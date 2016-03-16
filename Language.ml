@@ -5,9 +5,6 @@ open Evaluator
 
 exception ParseError of string
 
-let global_types  = extend Head
-let global_values = extend Head
-
 let parse str = try Parser.parser Lexer.lexer (Lexing.from_string str) with Parsing.Parse_error -> raise (ParseError str)
 let check ele = typeOf global_types ele
 

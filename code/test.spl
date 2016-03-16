@@ -1,0 +1,7 @@
+int -> int -> int test = lambda (int a) (
+  lambda (int b) {
+    a + b
+  }
+);
+
+println_int test (1) (2)

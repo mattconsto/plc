@@ -67,7 +67,7 @@ let rec typeOf env e = flush_all(); match e with
 		| true  -> typeOf env e
 		| false -> raise (TypeError "Rebind"))
 
-	| TermLambda (x, t, e) -> TypeFun(t, typeOf (bind env x t) e)
+	| TermLambda (x, old, t, e) -> TypeFun(t, typeOf (bind env x t) e)
 
 	| TermApply (a, b) -> (	match typeOf env a with
 		| TypeFun (tT, tU) -> (

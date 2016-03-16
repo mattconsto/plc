@@ -1,5 +1,6 @@
 %{
 	open Types
+	open Language
 %}
 /* Keywords */
 %token <int> INT
@@ -28,7 +29,7 @@
 /* Associativity */
 
 /* Low */
-%left FUNTYPE
+%right FUNTYPE
 %left IN IF THEN ELSE FUN MATCH WHILE DONE DO FOR DONE BREAK CONTINUE RETURN ASSERT EXIT CONS HEAD TAIL PRINT_INT PRINT_STRING PRINT_BOOL PRINTLN_INT PRINTLN_STRING PRINTLN_BOOL READ_INT READ_STRING READ_BOOL RANDOM
 %left IDENT STRING
 %left TRUE FALSE
@@ -94,7 +95,7 @@ expr:
 	| EXIT expr                                        { TermExit $2 }
 	| EXIT                                             { TermExit (TermNum 0) }
 
-	| LAMBDA ROUNDL type_spec IDENT ROUNDR expr        { TermLambda ($4, $3, $6) }
+	| LAMBDA ROUNDL type_spec IDENT ROUNDR expr        { TermLambda ($4, global_values, $3, $6) }
 	| expr ROUNDL expr ROUNDR                          { TermApply ($1, $3) }
 	| ROUNDL expr ROUNDR                               { $2 }
 	| CURLYL exprs CURLYR                              { TermScope $2 }
