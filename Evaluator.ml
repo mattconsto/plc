@@ -177,5 +177,12 @@ let rec eval output error input env e = flush_all (); match e with
 
 	| TermLambda(x, t, a) -> TermLambda(x, t, a)
 
+	| TermMap(f,d) -> (let rec map func data result =
+											match data with
+												| TermPair(h,t) -> let r = (eval output error input env (TermApply(func, h))) in map func t (r :: result)
+												| TermUnit			-> TermList result
+												| _ 						-> raise (StuckTerm "Map") in
+											map f (eval output error input env d) [])
+
 	| TermUnit -> TermUnit
 	| _ -> raise (StuckTerm "Unknown")

@@ -76,3 +76,8 @@ let rec typeOf env e = flush_all(); match e with
 				| false -> raise (TypeError "Apply")
 				)
 		| _ -> raise (TypeError (Printf.sprintf "While binding got %s which is not a function" (type_to_string (typeOf env a)))))
+
+	| TermMap (f, l) -> ( match (f, typeOf env l) with
+												| (TermLambda (x,t,e), TypePair (h,r)) -> TypeList h
+												| (TermLambda (x,t,e), TypeUnit) 			 -> TypeUnit
+												| (_, _) 															 -> raise (TypeError "Map"))

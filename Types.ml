@@ -67,6 +67,11 @@ type aquaTerm =
 	| TermLambda of string * aquaType * aquaTerm
 	| TermApply of aquaTerm * aquaTerm
 
+	| TermMap of aquaTerm * aquaTerm
+	| TermFold of aquaTerm * aquaTerm
+	| TermFilter of aquaTerm * aquaTerm
+	| TermLimit of aquaTerm * aquaTerm
+
 let rec type_to_string aquaType = match aquaType with
 	| TypeUnit        -> "TypeUnit"
 	| TypeNum         -> "TypeNum"

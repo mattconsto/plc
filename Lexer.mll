@@ -21,6 +21,11 @@ rule lexer = parse
 	| "->"   | "→" | "to" | "To"          { FUNTYPE }
 	| "\\l"  | "lambda" | "Lambda"        { LAMBDA }
 
+	| "map"    | "Map"										{ MAP }
+	| "fold"   | "Fold" 									{ FOLD }
+	| "filter" | "Filter"									{ FILTER }
+	| "limit"	 | "Limit"									{ LIMIT }
+
 	| "in"        | "In"                  { IN }
 	| "if"        | "If"                  { IF }
 	| "then"      | "Then"                { THEN }
