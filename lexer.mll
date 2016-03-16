@@ -7,7 +7,8 @@ rule lexer = parse
 	(* whitespace *)
 	| [' ''\t''\n']                       { lexer lexbuf }
 
-	| '/'[' ''\t''\n']*'*'                { ignore (read_comment (Buffer.create 1000) lexbuf); lexer lexbuf }
+	| "//"                                { ignore (read_line_comment (Buffer.create 1000) lexbuf); lexer lexbuf }
+	| '/'[' ''\t''\n']*'*'                { ignore (read_block_comment (Buffer.create 1000) lexbuf); lexer lexbuf }
 
 	(* Identifier *)
 	| "⊤" | "true"  | "True"              { TRUE }
@@ -16,7 +17,8 @@ rule lexer = parse
 	| "unit" | "Unit"                     { UTYPE }
 	| "int"  | "Int"                      { ITYPE }
 	| "list" | "List"                     { LTYPE }
-	| "->"   | "→"                        { FUNTYPE }
+	| "pair" | "Pair"                     { PTYPE }
+	| "->"   | "→" | "to" | "To"          { FUNTYPE }
 	| "\\l"  | "lambda" | "Lambda"        { LAMBDA }
 
 	| "in"        | "In"                  { IN }
@@ -122,11 +124,16 @@ and read_string buf = parse
 	| '\\' 'n'                            { Buffer.add_char buf '\n'; read_string buf lexbuf }
 	| '\\' 'r'                            { Buffer.add_char buf '\r'; read_string buf lexbuf }
 	| '\\' 't'                            { Buffer.add_char buf '\t'; read_string buf lexbuf }
-	| [^ '"' '\\']+                       { Buffer.add_string buf (Lexing.lexeme lexbuf); read_string buf lexbuf}
+	| [^ '"' '\\']+                       { Buffer.add_string buf (Lexing.lexeme lexbuf); read_string buf lexbuf }
 	| _                                   { raise (SyntaxError ("Illegal string character: " ^ Lexing.lexeme lexbuf)) }
 	| eof                                 { raise (SyntaxError ("String is not terminated!")) }
 
-and read_comment buf = parse
+and read_block_comment buf = parse
 	| '*'[' ''\t''\n']*'/'                { Buffer.contents buf }
-	| eof                                 { raise (SyntaxError ("Comment is not terminated!")) }
-	| _                                   { Buffer.add_string buf (Lexing.lexeme lexbuf); read_comment buf lexbuf}
+	| eof                                 { Buffer.contents buf }
+	| _                                   { Buffer.add_string buf (Lexing.lexeme lexbuf); read_block_comment buf lexbuf}
+
+and read_line_comment buf = parse
+	| [^'\n']*                            { Buffer.add_string buf (Lexing.lexeme lexbuf); read_line_comment buf lexbuf }
+	| '\n'                                { Buffer.contents buf }
+	| eof                                 { Buffer.contents buf }

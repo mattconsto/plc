@@ -67,6 +67,8 @@ let rec eval output error input env e = match e with
 	| TermVar x -> lookup env x
 	| TermNum n -> TermNum n
 
+	| TermList a -> TermList a
+
 	| TermString (s)           -> eval output error input env (
 		let rec exp i l = if i < 0 then l else exp (i - 1) (TermCons (TermNum (Char.code s.[i]), l)) in
 		exp (String.length s - 1) TermUnit)

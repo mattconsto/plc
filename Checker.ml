@@ -9,6 +9,7 @@ let rec typeOf env e = match e with
 	| TermUnit        -> TypeUnit
 	| TermNum       n -> TypeNum
 	| TermPair (a, b) -> TypePair ((typeOf env a), (typeOf env b))
+	| TermList      a -> TypeList (typeOf env (List.hd a))
 	| TermVar       x -> (try lookup env x with EnvironmentReachedHead -> raise (TypeError ("Variable: " ^ x)))
 	| TermString    s -> TypePair (TypeNum, TypeNum)
 

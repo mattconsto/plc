@@ -1,10 +1,11 @@
-type aquaType = TypeUnit | TypeNum | TypePair of aquaType * aquaType | TypeFun of aquaType * aquaType
+type aquaType = TypeUnit | TypeNum | TypePair of aquaType * aquaType | TypeList of aquaType | TypeFun of aquaType * aquaType
 
 (* Grammar of the language *)
 type aquaTerm =
 	| TermUnit
 	| TermNum of int
 	| TermPair of aquaTerm * aquaTerm
+	| TermList of aquaTerm list
 	| TermString of string
 
 	| TermLessThan of aquaTerm * aquaTerm

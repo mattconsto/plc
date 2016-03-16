@@ -17,7 +17,7 @@
 %token TRUE FALSE
 %token IN IF THEN ELSE FUN MATCH WHILE DONE DO DONE FOR BREAK CONTINUE RETURN ASSERT EXIT CONS HEAD TAIL PRINT_INT PRINT_STRING PRINT_BOOL PRINTLN_INT PRINTLN_STRING PRINTLN_BOOL READ_INT READ_STRING READ_BOOL RANDOM
 
-%token LAMBDA ROUNDL ROUNDR UTYPE ITYPE LTYPE FUNTYPE
+%token LAMBDA ROUNDL ROUNDR UTYPE ITYPE LTYPE PTYPE FUNTYPE
 
 /* Brackets */
 %token CURLYL CURLYR ROUNDL ROUNDR SQUAREL SQUARER
@@ -64,7 +64,8 @@ parser:
 type_spec:
 	| UTYPE                                            { TypeUnit }
 	| ITYPE                                            { TypeNum }
-	| LTYPE type_spec type_spec                        { TypePair ($2, $3) }
+	| PTYPE COMPARE_LT type_spec COMMA type_spec COMPARE_GT { TypePair ($3, $5) }
+	| LTYPE COMPARE_LT type_spec COMPARE_GT            { TypeList $3 }
 	| type_spec FUNTYPE type_spec                      { TypeFun ($1, $3) }
 
 exprs:
