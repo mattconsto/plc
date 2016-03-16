@@ -31,12 +31,14 @@ type aquaTerm =
 	| TermBitwiseXOr of aquaTerm * aquaTerm
 	| TermBitwiseOr of aquaTerm * aquaTerm
 
+	| TermScope of aquaTerm
 	| TermWhile of aquaTerm * aquaTerm
 	| TermDo of aquaTerm * aquaTerm
 	| TermFor of aquaTerm * aquaTerm * aquaTerm * aquaTerm
 
 	| TermBreak
 	| TermContinue
+	| TermReturn of aquaTerm
 	| TermAssert of aquaTerm
 	| TermExit of aquaTerm
 

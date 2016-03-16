@@ -38,8 +38,11 @@ let rec typeOf env e = match e with
 		| TypeInt, TypeInt -> TypeInt
 		| _ -> raise (TypeError "Binary Operation"))
 
+	| TermScope a -> ignore (typeOf (extend env) a); TypeUnit
+
 	| TermWhile (a, b) | TermDo (a, b) -> let scope = extend env in (ignore (typeOf scope a); ignore (typeOf scope b)); TypeUnit
 	| TermFor(a, b, c, d) -> let scope = extend env in (ignore (typeOf scope a); ignore (typeOf scope b); ignore (typeOf scope c); ignore (typeOf scope d)); TypeUnit
+	| TermReturn a -> typeOf env a
 	| TermAssert a -> TypeUnit
 	| TermBreak -> TypeUnit
 	| TermContinue -> TypeUnit
@@ -53,11 +56,11 @@ let rec typeOf env e = match e with
 	| TermIf (a, b, c) -> let scope = extend env in (ignore (typeOf scope a); ignore (typeOf scope b); ignore (typeOf scope c)); TypeUnit
 
 	| TermBind (x, t, e) -> (match ((typeOf env e) = t) with
-		| true -> ignore (bind env x t); TypeUnit
+		| true -> ignore (bind env x t); t
 		| false -> raise (TypeError "Let"))
 
 	| TermReBind (x, e) -> (match ((typeOf env e) = (lookup env x)) with
-		| true  -> TypeUnit
+		| true  -> typeOf env e
 		| false -> raise (TypeError "Rebind"))
 
 	| TermLambda (x, t, e) -> TypeFun(t, typeOf (bind env x t) e)

@@ -1,4 +1,6 @@
-print_int 0;
+int copy = 0;
 
-/* Lets print what we read, forever! */
-while true do print_int read_int;
+while true do {
+  println_int copy;
+  copy = read_int;
+}

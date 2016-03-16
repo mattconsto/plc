@@ -7,4 +7,6 @@ val parse : string   -> aquaTerm
 (* Type check a tree *)
 val check : aquaTerm -> aquaType
 (* Evaluate a tree *)
-val eval  : aquaTerm -> aquaTerm
+val eval  : out_channel -> out_channel -> in_channel -> aquaTerm -> aquaTerm
+(* Run *)
+val run   : out_channel -> out_channel -> in_channel -> string -> aquaTerm

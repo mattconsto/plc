@@ -13,6 +13,7 @@ rule lexer = parse
 	| "⊤" | "true"  | "True"              { TRUE }
 	| "⊥" | "false" | "False"             { FALSE }
 
+	| "unit" | "Unit"                     { UTYPE }
 	| "int"  | "Int"                      { ITYPE }
 	| "list" | "List"                     { LTYPE }
 	| "->"   | "→"                        { FUNTYPE }
@@ -28,8 +29,10 @@ rule lexer = parse
 	| "done"      | "Done"                { DONE }
 	| "do"        | "Do"                  { DO }
 	| "for"       | "For"                 { FOR }
+	| "done"      | "Done"                { DONE }
 	| "break"     | "Break"               { BREAK }
 	| "continue"  | "Continue"            { CONTINUE }
+	| "return"    | "Return"              { RETURN }
 	| "assert"    | "Assert"              { ASSERT }
 	| "exit"      | "Exit"                { EXIT }
 	| "cons"      | "Cons"                { CONS }
@@ -45,6 +48,10 @@ rule lexer = parse
 	| "print_int"    | "Print_Int"        { PRINT_INT }
 	| "print_string" | "Print_String"     { PRINT_STRING }
 	| "print_bool"   | "Print_Bool"       { PRINT_BOOL }
+
+	| "println_int"    | "Println_Int"        { PRINTLN_INT }
+	| "println_string" | "Println_String"     { PRINTLN_STRING }
+	| "println_bool"   | "Println_Bool"       { PRINTLN_BOOL }
 
 	(* Brackets *)
 	| '{'                                 { CURLYL }

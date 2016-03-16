@@ -2,5 +2,5 @@ int total = 0
 
 while true do {
   total += read_int;
-  print_int total;
+  println_int total;
 }

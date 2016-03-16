@@ -6,8 +6,7 @@ int b = 0;
 int t = 0;
 
 while true do {
-  t = a + b + read_int;
+  println_int (t = a + b + read_int);
   a = b;
   b = t;
-  print_int t;
 }
