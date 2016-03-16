@@ -1,4 +1,4 @@
-type aquaType = TypeUnit | TypeInt | TypePair of aquaType * aquaType | TypeFun of aquaType * aquaType
+type aquaType = TypeUnit | TypeNum | TypePair of aquaType * aquaType | TypeFun of aquaType * aquaType
 
 (* Grammar of the language *)
 type aquaTerm =

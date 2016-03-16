@@ -63,7 +63,7 @@ parser:
 
 type_spec:
 	| UTYPE                                            { TypeUnit }
-	| ITYPE                                            { TypeInt }
+	| ITYPE                                            { TypeNum }
 	| LTYPE type_spec type_spec                        { TypePair ($2, $3) }
 	| type_spec FUNTYPE type_spec                      { TypeFun ($1, $3) }
 

@@ -7,35 +7,35 @@ exception TypeError of string;;
 let rec typeOf env e = match e with
 	(* data *)
 	| TermUnit        -> TypeUnit
-	| TermNum       n -> TypeInt
+	| TermNum       n -> TypeNum
 	| TermPair (a, b) -> TypePair ((typeOf env a), (typeOf env b))
 	| TermVar       x -> (try lookup env x with EnvironmentReachedHead -> raise (TypeError ("Variable: " ^ x)))
-	| TermString    s -> TypePair (TypeInt, TypeInt)
+	| TermString    s -> TypePair (TypeNum, TypeNum)
 
-	| TermReadInt     -> TypeInt
-	| TermReadString  -> TypeInt
-	| TermReadBool    -> TypeInt
+	| TermReadInt     -> TypeNum
+	| TermReadString  -> TypeNum
+	| TermReadBool    -> TypeNum
 	| TermPrintString a | TermPrintInt a | TermPrintBool a -> TypeUnit
 
-	| TermRandom (a, b) -> TypeInt
+	| TermRandom (a, b) -> TypeNum
 
 	| TermLessThan (a, b) | TermLessThanEqual (a, b) | TermMoreThan (a, b) | TermMoreThanEqual (a, b) | TermEqual (a, b) | TermNotEqual (a, b)
 	-> (match (typeOf env a), (typeOf env b) with
-		| TypeInt, TypeInt -> TypeInt
+		| TypeNum, TypeNum -> TypeNum
 		| _ -> raise (TypeError "Comparison"))
 
 	| TermUnaryNot a -> (match (typeOf env a) with
-		| TypeInt -> TypeInt
+		| TypeNum -> TypeNum
 		| _ -> raise (TypeError "Unary Not"))
 
 	| TermUnaryMinus a | TermUnaryPlus a -> (match (typeOf env a) with
-		| TypeInt -> TypeInt
+		| TypeNum -> TypeNum
 		| _ -> raise (TypeError "Unary Operation"))
 
 	| TermPower (a, b) | TermMultiply (a, b) | TermDivide (a, b) | TermModulo (a, b) | TermPlus (a, b) | TermSubtract (a, b)
 	| TermShiftLeft (a, b) | TermShiftRight (a, b) | TermBitwiseAnd (a, b) | TermBitwiseXOr (a, b) | TermBitwiseOr (a, b)
 	-> (match (typeOf env a), (typeOf env b) with
-		| TypeInt, TypeInt -> TypeInt
+		| TypeNum, TypeNum -> TypeNum
 		| _ -> raise (TypeError "Binary Operation"))
 
 	| TermScope a -> ignore (typeOf (extend env) a); TypeUnit
