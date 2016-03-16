@@ -54,6 +54,7 @@ let rec typeOf env e = flush_all(); match e with
 	| TermConsLast (a, b) -> (match typeOf env a, typeOf env b with n, m -> m)
 	| TermHead a -> (match typeOf env a with TypePair(j, k) -> j | _ -> raise (TypeError "Head"))
 	| TermTail a -> (match typeOf env a with TypePair(j, k) -> k | _ -> raise (TypeError "Tail"))
+	| TermLength a -> (match typeOf env a with TypePair(j,k) -> TypeNum | TypeUnit -> TypeNum | _ -> raise (TypeError "Length"))
 
 	(* complicated *)
 	| TermIf (a, b, c) -> let scope = extend env in (ignore (typeOf scope a); ignore (typeOf scope b); ignore (typeOf scope c)); TypeUnit

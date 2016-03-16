@@ -1,21 +1,6 @@
-// int -> int foo = lambda (int a) {a*a};
-// int -> int bar = lambda (int b) (foo(10)+1);
-// println_int (bar (10));
-
-int -> int count = lambda (int a) {
-  int -> int inner = lambda (int c) {
-    if c > 10 then exit 0 done
-    println_int c
-    inner (a + c)
-  }
-  inner (0)
-}
-count (2)
-
-/*int copy = 0;
+int copy = 0;
 
 while true do {
   println_int copy;
   copy = read_int;
 }
-*/
