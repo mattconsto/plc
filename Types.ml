@@ -56,6 +56,7 @@ type aquaTerm =
 	| TermCons of aquaTerm * aquaTerm
 	| TermHead of aquaTerm
 	| TermTail of aquaTerm
+	| TermLength of aquaTerm
 
 	| TermVar of string
 	| TermIf of aquaTerm * aquaTerm * aquaTerm
