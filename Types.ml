@@ -63,3 +63,66 @@ type aquaTerm =
 	| TermReBind of string * aquaTerm
 	| TermLambda of string * aquaType * aquaTerm
 	| TermApply of aquaTerm * aquaTerm
+
+let term_to_string aquaTerm = match aquaTerm with
+	| TermUnit -> "TermUnit"
+	| TermNum _ -> "TermNum"
+	| TermPair _ -> "TermPair"
+	| TermList _ -> "TermList"
+	| TermString _ -> "TermString"
+
+	| TermLessThan _ -> "TermLessThan"
+	| TermLessThanEqual _ -> "TermLessThanEqual"
+	| TermMoreThan _ -> "TermMoreThan"
+	| TermMoreThanEqual _ -> "TermMoreThanEqual"
+	| TermEqual _ -> "TermEqual"
+	| TermNotEqual _ -> "TermNotEqual"
+
+	| TermUnaryNot _ -> "TermUnaryNot"
+	| TermUnaryMinus _ -> "TermUnaryMinus"
+	| TermUnaryPlus _ -> "TermUnaryPlus"
+
+	| TermPower _ -> "TermPower"
+	| TermMultiply _ -> "TermMultiply"
+	| TermDivide _ -> "TermDivide"
+	| TermModulo _ -> "TermModulo"
+	| TermPlus _ -> "TermPlus"
+	| TermSubtract _ -> "TermSubtract"
+
+	| TermShiftLeft _ -> "TermShiftLeft"
+	| TermShiftRight _ -> "TermShiftRight"
+	| TermBitwiseAnd _ -> "TermBitwiseAnd"
+	| TermBitwiseXOr _ -> "TermBitwiseXOr"
+	| TermBitwiseOr _ -> "TermBitwiseOr"
+
+	| TermScope _ -> "TermScope"
+	| TermWhile _ -> "TermWhile"
+	| TermDo _ -> "TermDo"
+	| TermFor _ -> "TermFor"
+
+	| TermBreak -> "TermBreak"
+	| TermContinue -> "TermContinue"
+	| TermReturn _ -> "TermReturn"
+	| TermAssert _ -> "TermAssert"
+	| TermExit _ -> "TermExit"
+
+	| TermReadInt -> "TermReadInt"
+	| TermReadString -> "TermReadString"
+	| TermReadBool -> "TermReadBool"
+
+	| TermPrintInt _ -> "TermPrintInt"
+	| TermPrintString _ -> "TermPrintString"
+	| TermPrintBool _ -> "TermPrintBool"
+
+	| TermRandom _ -> "TermRandom"
+
+	| TermCons _ -> "TermCons"
+	| TermHead _ -> "TermHead"
+	| TermTail _ -> "TermTail"
+
+	| TermVar _ -> "TermVar"
+	| TermIf _ -> "TermIf"
+	| TermBind _ -> "TermBind"
+	| TermReBind _ -> "TermReBind"
+	| TermLambda _ -> "TermLambda"
+	| TermApply _ -> "TermApply"

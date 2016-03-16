@@ -3,7 +3,7 @@ open Environment
 
 exception Terminated of aquaTerm
 exception StuckTerm of string
-exception NonBaseTypeResult
+exception NonBaseTypeResult of aquaTerm
 
 exception AssertionFailed of aquaTerm
 exception LoopBreak
@@ -17,7 +17,7 @@ let rec result_to_int res = match res with
 		| TermUnit -> (result_to_int a)
 		| _      -> (result_to_int a) ^ " " ^ (result_to_int b))
 	| TermLambda(x, t, a) -> Printf.sprintf "lambda (%s)" x
-	| _ -> raise NonBaseTypeResult
+	| a -> raise (NonBaseTypeResult a)
 
 let rec result_to_string res = match res with
 	| TermUnit        -> ""
@@ -26,7 +26,7 @@ let rec result_to_string res = match res with
 		| TermUnit -> (result_to_string a)
 		| _      -> (result_to_string a) ^ (result_to_string b))
 	| TermLambda(x, t, a) -> Printf.sprintf "lambda (%s)" x
-	| _ -> raise NonBaseTypeResult
+	| a -> raise (NonBaseTypeResult a)
 
 let rec result_to_bool res = match res with
 	| TermUnit        -> "[]"
@@ -35,7 +35,7 @@ let rec result_to_bool res = match res with
 		| TermUnit -> (result_to_bool a)
 		| _      -> (result_to_bool a) ^ " " ^ (result_to_bool b))
 	| TermLambda(x, t, a) -> Printf.sprintf "lambda (%s)" x
-	| _ -> raise NonBaseTypeResult
+	| a -> raise (NonBaseTypeResult a)
 
 let equality_test e = (match e with
 	| TermNum  0
@@ -50,7 +50,7 @@ let read_number input = fun () -> (
 	while !read_line_cache = [] do ignore (read_line_cache := Str.split (Str.regexp " ") (input_line input)) done;
 	match !read_line_cache with
 		| (head :: tail) -> (read_line_cache := tail; int_of_string head)
-		| [] -> raise NonBaseTypeResult);;
+		| [] -> raise (Failure "read_number"));;
 
 let read_bool input = fun () -> (
 	while !read_line_cache = [] do ignore (read_line_cache := Str.split (Str.regexp " ") (input_line input)) done;
@@ -58,12 +58,12 @@ let read_bool input = fun () -> (
 		| (head :: tail) -> (read_line_cache := tail; match String.lowercase head with
 			| "true" | "t" | "yes" | "y" | "1" -> true
 			| _ -> false)
-		| [] -> raise NonBaseTypeResult);;
+		| [] -> raise (Failure "read_bool"));;
 
 Random.self_init();;
 
 (* bigEval *)
-let rec eval output error input env e = match e with
+let rec eval output error input env e = flush_all (); match e with
 	| TermVar x -> lookup env x
 	| TermNum n -> TermNum n
 
@@ -159,12 +159,12 @@ let rec eval output error input env e = match e with
 		| false -> eval output error input scope b
 		| true  -> eval output error input scope a)
 
-	| TermBind (x, tT, a)     -> let temp = eval output error input env a in (ignore (bind env x temp); temp)
+	| TermBind (x, tT, a)     -> let temp = eval output error input (bind env x a) a in (ignore (rebind env x temp); temp)
 	| TermReBind (x,  a)      -> let temp = eval output error input env a in (ignore (rebind env x temp); temp)
 
 	| TermApply (a, b) -> (match (eval output error input env a) with
 		| TermLambda(x, t, a) -> (try
-				let scope = extend env in (ignore (bind scope x b); eval output error input scope a)
+				let scope = extend env in (ignore (bind scope x (eval output error input scope b)); eval output error input scope a)
 			with Return a -> a)
 		| _ -> raise (StuckTerm "Apply"))
 
