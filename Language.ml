@@ -16,7 +16,7 @@ let eval output error input ele = eval output error input global_values ele
 (* Do everything *)
 let run output error input str = try
   let ele = parse str in (
-  (* ignore (check ele); *)
+  ignore (check ele);
   eval output error input ele)
 with
   | EnvironmentReachedHead -> Printf.fprintf error "Eval: Variable not bound!\n"; TermUnit

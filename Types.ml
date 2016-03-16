@@ -54,6 +54,8 @@ type aquaTerm =
 	| TermRandom of aquaTerm * aquaTerm
 
 	| TermCons of aquaTerm * aquaTerm
+	| TermConsFirst of aquaTerm * aquaTerm
+	| TermConsLast of aquaTerm * aquaTerm
 	| TermHead of aquaTerm
 	| TermTail of aquaTerm
 
@@ -63,6 +65,13 @@ type aquaTerm =
 	| TermReBind of string * aquaTerm
 	| TermLambda of string * aquaType * aquaTerm
 	| TermApply of aquaTerm * aquaTerm
+
+let rec type_to_string aquaType = match aquaType with
+	| TypeUnit        -> "TypeUnit"
+	| TypeNum         -> "TypeNum"
+	| TypePair (a, b) -> Printf.sprintf "TypePair<%s, %s>" (type_to_string a) (type_to_string b)
+	| TypeList a      -> Printf.sprintf "TypeList<%s>" (type_to_string a)
+	| TypeFun (a, b)  -> Printf.sprintf "TypeFun<%s, %s>" (type_to_string a) (type_to_string b)
 
 let term_to_string aquaTerm = match aquaTerm with
 	| TermUnit -> "TermUnit"
@@ -117,6 +126,8 @@ let term_to_string aquaTerm = match aquaTerm with
 	| TermRandom _ -> "TermRandom"
 
 	| TermCons _ -> "TermCons"
+	| TermConsFirst _ -> "TermConsFirst"
+	| TermConsLast _ -> "TermConsLast"
 	| TermHead _ -> "TermHead"
 	| TermTail _ -> "TermTail"
 

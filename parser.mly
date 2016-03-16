@@ -58,7 +58,7 @@
 %%
 
 parser:
-	| exprs EOF                                        { TermCons ($1, TermUnit) }
+	| exprs EOF                                        { $1 }
 	| EOF                                              { TermUnit }
 
 type_spec:
@@ -67,14 +67,14 @@ type_spec:
 	| PTYPE COMPARE_LT type_spec COMMA type_spec COMPARE_GT { TypePair ($3, $5) }
 	| LTYPE COMPARE_LT type_spec COMPARE_GT            { TypeList $3 }
 	| type_spec FUNTYPE type_spec                      { TypeFun ($1, $3) }
+	| ROUNDL type_spec ROUNDR                          { $2 }
 
 exprs:
-	| expr exprs                                       { TermCons ($1, $2) }
+	| expr exprs                                       { TermConsLast ($1, $2) }
 	| expr                                             { $1 }
 
 expr:
 	| SEMI_COLON                                       { TermUnit }
-	| ROUNDL ROUNDR                                    { TermUnit }
 
 	| loop                                             { $1 }
 	| assign                                           { $1 }

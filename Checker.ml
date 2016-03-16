@@ -50,15 +50,17 @@ let rec typeOf env e = flush_all(); match e with
 	| TermExit a -> TypeUnit
 
 	| TermCons (a, b) -> (match typeOf env a, typeOf env b with n, m -> TypePair (n, m))
+	| TermConsFirst (a, b) -> (match typeOf env a, typeOf env b with n, m -> n)
+	| TermConsLast (a, b) -> (match typeOf env a, typeOf env b with n, m -> m)
 	| TermHead a -> (match typeOf env a with TypePair(j, k) -> j | _ -> raise (TypeError "Head"))
 	| TermTail a -> (match typeOf env a with TypePair(j, k) -> k | _ -> raise (TypeError "Tail"))
 
 	(* complicated *)
 	| TermIf (a, b, c) -> let scope = extend env in (ignore (typeOf scope a); ignore (typeOf scope b); ignore (typeOf scope c)); TypeUnit
 
-	| TermBind (x, t, e) -> (match ((typeOf env e) = t) with
+	| TermBind (x, t, e) -> (let temp = (typeOf (bind env x t) e) in match (temp = t) with
 		| true -> ignore (bind env x t); t
-		| false -> raise (TypeError ("while binding " ^ x)))
+		| false -> raise (TypeError (Printf.sprintf "While binding got %s, expected %s" (type_to_string temp) (type_to_string t))))
 
 	| TermReBind (x, e) -> (match ((typeOf env e) = (lookup env x)) with
 		| true  -> typeOf env e
@@ -72,4 +74,4 @@ let rec typeOf env e = flush_all(); match e with
 				| true -> tT
 				| false -> raise (TypeError "Apply")
 				)
-		| _ -> raise (TypeError "Apply"))
+		| _ -> raise (TypeError (Printf.sprintf "While binding got %s which is not a function" (type_to_string (typeOf env a)))))

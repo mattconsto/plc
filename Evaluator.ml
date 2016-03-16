@@ -152,6 +152,8 @@ let rec eval output error input env e = flush_all (); match e with
 	| TermExit a               -> raise (Terminated (eval output error input env a))
 
 	| TermCons          (a, b) -> (match eval output error input env a, eval output error input env b with n, m -> TermPair(n, m))
+	| TermConsFirst     (a, b) -> (match eval output error input env a, eval output error input env b with n, m -> n)
+	| TermConsLast      (a, b) -> (match eval output error input env a, eval output error input env b with n, m -> m)
 	| TermHead          (a)    -> (match eval output error input env a with TermPair (n, m) -> n | _ -> raise (StuckTerm "Head"))
 	| TermTail          (a)    -> (match eval output error input env a with TermPair (n, m) -> m | _ -> raise (StuckTerm "Tail"))
 
@@ -160,7 +162,7 @@ let rec eval output error input env e = flush_all (); match e with
 		| true  -> eval output error input scope a)
 
 	| TermBind (x, tT, a)     -> let temp = eval output error input (bind env x a) a in (ignore (rebind env x temp); temp)
-	| TermReBind (x,  a)      -> let temp = eval output error input env a in (ignore (rebind env x temp); temp)
+	| TermReBind (x,  a)      -> let temp = eval output error input (rebind env x a) a in (ignore (rebind env x temp); temp)
 
 	| TermApply (a, b) -> (match (eval output error input env a) with
 		| TermLambda(x, t, a) -> (try
