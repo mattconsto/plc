@@ -89,3 +89,13 @@ let rec typeOf env e = flush_all(); match e with
 												| (TermLambda (x,old,t,e), TypePair (h,r)) -> TypeList h
 												| (TermLambda (x,old,t,e), TypeUnit) 			 -> TypeUnit
 												| (_, _) 															 -> raise (TypeError "Map"))
+
+	| TermFilter (f, l) -> (match (f, typeOf env l) with
+													| (TermLambda (x,old,t,e), TypePair(h,r)) -> TypeList h
+													| (TermLambda (x,old,t,e), TypeUnit)			-> TypeUnit
+													| (_,_)																		-> raise (TypeError "Filter"))
+
+	| TermFold (f, l, n) -> (match (f, typeOf env l, typeOf env n) with
+														| (TermLambda(x,old,t,e), TypePair(h,r), TypeNum) -> TypeList h
+														| (TermLambda(x,old,t,e), TypeUnit, TypeNum) -> TypeUnit
+														| (_,_,_) 																					-> raise (TypeError "Fold"))

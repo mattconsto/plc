@@ -16,7 +16,6 @@ let rec result_to_int res = match res with
 	| TermPair(a, b) -> (match b with
 		| TermUnit -> (result_to_int a)
 		| _      -> (result_to_int a) ^ " " ^ (result_to_int b))
-	| TermLambda(x, old, t, a) -> Printf.sprintf "lambda (%s)" x
 	| TermList l -> (let rec printlist l s = match l with (h :: t) -> printlist t (s ^ " " ^ (result_to_int h)) | [] -> s in printlist l "")
 	| a -> raise (NonBaseTypeResult a)
 
@@ -213,6 +212,27 @@ let rec eval co ce ci env e = flush_all (); match e with
 													| TermUnit			-> TermList result
 													| _ 						-> raise (StuckTerm "Map")) in
 											map (eval co ce ci env f) (eval co ce ci env d) [])
+	 | TermFilter (f,d) -> (let rec filter func data result =
+		 												match data with
+															| TermPair (head,tail) -> let apply = (TermApply (func, head)) in
+																												let r = (eval co ce ci env apply) in
+																												(match r with
+																													| TermNum 0 							 -> filter func tail result
+																													| _ 											 -> filter func tail (head :: result))
+															| TermUnit -> TermList result
+															| _ -> raise (StuckTerm "Filter") in
+													filter (eval co ce ci env f) (eval co ce ci env d) [])
+	| TermFold (f,d,n) -> (let rec fold func data result =
+													(match data with
+														| TermPair (head, tail) -> let apply = (TermApply (func, TermList((result :: head :: [])))) in
+																											 let r = (eval co ce ci env apply) in
+																											 fold func tail r
+														| TermUnit -> result
+														| _ -> raise (StuckTerm "Fold")) in
+													fold (eval co ce ci env f) (eval co ce ci env d) (eval co ce ci env n))
+
+	| TermUnit -> TermUnit
+	| _ -> raise (StuckTerm "Unknown")
 
 	| TermUnit                 -> TermUnit
 	| a                        -> raise (NonBaseTypeResult a)
