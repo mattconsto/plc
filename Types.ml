@@ -28,6 +28,10 @@ type aquaTerm =
 	| TermPlus of aquaTerm * aquaTerm
 	| TermSubtract of aquaTerm * aquaTerm
 
+	| TermStringLower of aquaTerm
+	| TermStringUpper of aquaTerm
+	| TermStringRev of aquaTerm
+
 	| TermMathMin of aquaTerm * aquaTerm
 	| TermMathMax of aquaTerm * aquaTerm
 	| TermMathAbs of aquaTerm
@@ -124,6 +128,10 @@ let term_to_string aquaTerm = match aquaTerm with
 	| TermModulo _ -> "TermModulo"
 	| TermPlus _ -> "TermPlus"
 	| TermSubtract _ -> "TermSubtract"
+
+	| TermStringLower _ -> "TermStringLower"
+	| TermStringUpper _ -> "TermStringUpper"
+	| TermStringRev _ -> "TermStringRev"
 
 	| TermMathMin _ -> "TermMathMin"
 	| TermMathMax _ -> "TermMathMax"

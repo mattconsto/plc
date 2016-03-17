@@ -27,12 +27,16 @@ let rec typeOf env e = flush_all(); match e with
 
 	| TermUnaryNot a -> (match (typeOf env a) with
 		| TypeNum -> TypeNum
-		| _ -> raise (TypeError ("A Numbers is required, given " ^ (type_to_string (typeOf env a)) ^ ".")))
+		| _ -> raise (TypeError ("A Number is required, given " ^ (type_to_string (typeOf env a)) ^ ".")))
+
+	| TermStringLower a | TermStringUpper a | TermStringRev a -> (match (typeOf env a) with
+		| TypePair(TypeNum, c) -> TypePair(TypeNum, c)
+		| _ -> raise (TypeError ("A Pair is required, given " ^ (type_to_string (typeOf env a)) ^ ".")))
 
 	| TermMathAbs a | TermMathSign a | TermMathSqrt a | TermMathLog a | TermMathLn a | TermMathFact a
 	| TermUnaryMinus a | TermUnaryPlus a -> (match (typeOf env a) with
 		| TypeNum -> TypeNum
-		| _ -> raise (TypeError ("A Numbers is required, given " ^ (type_to_string (typeOf env a)) ^ ".")))
+		| _ -> raise (TypeError ("A Number is required, given " ^ (type_to_string (typeOf env a)) ^ ".")))
 
 	| TermMathMin (a, b) | TermMathMax (a, b)
 	| TermPower (a, b) | TermMultiply (a, b) | TermDivide (a, b) | TermModulo (a, b) | TermPlus (a, b) | TermSubtract (a, b)

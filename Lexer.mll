@@ -49,6 +49,10 @@ rule lexer = parse
 	| "head"      | "Head"                                                        { HEAD }
 	| "tail"      | "Tail"                                                        { TAIL }
 
+	| "string.lower"           | "String.Lower"                                   { STRING_LOWER }
+	| "string.upper"           | "String.Upper"                                   { STRING_UPPER }
+	| "string.rev"             | "String.Rev"                                     { STRING_REV }
+
 	| "console.read_int"       | "Console.Read_Int"                               { READ_INT }
 	| "console.read_string"    | "Console.Read_String"                            { READ_STRING }
 	| "console.read_bool"      | "Console.Read_Bool"                              { READ_BOOL }
