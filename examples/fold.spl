@@ -1,1 +1,1 @@
-list.fold (lambda (int x) { lambda(int y) { x + y } }) [] 1
+list.fold (lambda (int x) { lambda(int y) { x + y } }) [1,2,3] 1

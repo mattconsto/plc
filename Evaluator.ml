@@ -224,10 +224,10 @@ let rec eval co ce ci env e = flush_all (); match e with
 													filter (eval co ce ci env f) (eval co ce ci env d) [])
 	| TermFold (f,d,n) -> (let rec fold func data result =
 													(match data with
-														| TermPair (head, tail) -> let apply = (TermApply (func, TermList((result :: head :: [])))) in
+														| TermPair (head, tail) -> let apply = (TermApply ((TermApply (func, result)), head)) in
 																											 let r = (eval co ce ci env apply) in
 																											 fold func tail r
-														| TermUnit -> result
+														| TermUnit -> (eval co ce ci env result)
 														| _ -> raise (StuckTerm "Fold")) in
 													fold (eval co ce ci env f) (eval co ce ci env d) (eval co ce ci env n))
 
