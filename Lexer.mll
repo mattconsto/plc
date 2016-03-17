@@ -55,6 +55,8 @@ rule lexer = parse
 	| "console.read_string"  | "Console.Read_String"      { READ_STRING }
 	| "console.read_bool"    | "Console.Read_Bool"        { READ_BOOL }
 
+	| "console.clear"        | "Console.Clear"            { CLEAR }
+
 	| "console.print_int"    | "Console.Print_Int"        { PRINT_INT }
 	| "console.print_string" | "Console.Print_String"     { PRINT_STRING }
 	| "console.print_bool"   | "Console.Print_Bool"       { PRINT_BOOL }

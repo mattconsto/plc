@@ -58,6 +58,8 @@ type aquaTerm =
 	| TermReadString
 	| TermReadBool
 
+	| TermClear
+
 	| TermPrintInt of aquaTerm
 	| TermPrintString of aquaTerm
 	| TermPrintBool of aquaTerm
@@ -152,6 +154,8 @@ let term_to_string aquaTerm = match aquaTerm with
 	| TermReadInt -> "TermReadInt"
 	| TermReadString -> "TermReadString"
 	| TermReadBool -> "TermReadBool"
+
+	| TermClear -> "TermClear"
 
 	| TermPrintInt _ -> "TermPrintInt"
 	| TermPrintString _ -> "TermPrintString"

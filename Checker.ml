@@ -14,6 +14,7 @@ let rec typeOf env e = flush_all(); match e with
 	| TermString    s -> TypePair (TypeNum, TypeNum)
 
 	| TermReadInt | TermReadString | TermReadBool -> TypeNum
+	| TermClear -> TypeUnit
 	| TermPrintString a | TermPrintInt a | TermPrintBool a -> TypeUnit
 	| TermErrorString a | TermErrorInt a | TermErrorBool a -> TypeUnit
 

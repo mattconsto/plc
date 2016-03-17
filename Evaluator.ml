@@ -76,6 +76,8 @@ let rec eval co ce ci env e = flush_all (); match e with
 	| TermReadString -> (eval co ce ci env (TermString (input_line ci)))
 	| TermReadBool -> if (read_bool ci) () then (eval co ce ci env (TermUnaryNot (TermNum 0))) else TermNum 0
 
+	| TermClear                   -> Sys.command "clear"; TermUnit
+
 	| TermPrintInt a              -> Printf.fprintf co "%s" (result_to_int (eval co ce ci env a)); TermUnit
 	| TermPrintString a           -> Printf.fprintf co "%s" (result_to_string (eval co ce ci env a)); TermUnit
 	| TermPrintBool a             -> Printf.fprintf co "%s" (result_to_bool (eval co ce ci env a)); TermUnit
