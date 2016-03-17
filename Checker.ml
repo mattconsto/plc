@@ -10,7 +10,7 @@ let rec typeOf env e = flush_all(); match e with
 	| TermNum       n -> TypeNum
 	| TermPair (a, b) -> TypePair ((typeOf env a), (typeOf env b))
 	| TermList      a -> TypeList (typeOf env (List.hd a))
-	| TermVar       x -> (try lookup env x with EnvironmentReachedHead e -> raise (TypeError ("Variable: " ^ x)))
+	| TermVar       x -> (try lookup env x with EnvironmentReachedHead e -> raise (TypeError ("Cannot find a binding for variable " ^ x)))
 	| TermString    s -> TypePair (TypeNum, TypeNum)
 
 	| TermReadInt | TermReadString | TermReadBool -> TypeNum
@@ -23,23 +23,23 @@ let rec typeOf env e = flush_all(); match e with
 	| TermLessThan (a, b) | TermLessThanEqual (a, b) | TermMoreThan (a, b) | TermMoreThanEqual (a, b) | TermEqual (a, b) | TermNotEqual (a, b)
 	-> (match (typeOf env a), (typeOf env b) with
 		| TypeNum, TypeNum -> TypeNum
-		| _ -> raise (TypeError "Comparison"))
+		| _ -> raise (TypeError ("Two Numbers are required, given " ^ (type_to_string (typeOf env a)) ^ " and " ^ (type_to_string (typeOf env b)) ^ ".")))
 
 	| TermUnaryNot a -> (match (typeOf env a) with
 		| TypeNum -> TypeNum
-		| _ -> raise (TypeError "Unary Not"))
+		| _ -> raise (TypeError ("A Numbers is required, given " ^ (type_to_string (typeOf env a)) ^ ".")))
 
 	| TermMathAbs a | TermMathSign a | TermMathSqrt a | TermMathLog a | TermMathLn a | TermMathFact a
 	| TermUnaryMinus a | TermUnaryPlus a -> (match (typeOf env a) with
 		| TypeNum -> TypeNum
-		| _ -> raise (TypeError "Unary Operation"))
+		| _ -> raise (TypeError ("A Numbers is required, given " ^ (type_to_string (typeOf env a)) ^ ".")))
 
 	| TermMathMin (a, b) | TermMathMax (a, b)
 	| TermPower (a, b) | TermMultiply (a, b) | TermDivide (a, b) | TermModulo (a, b) | TermPlus (a, b) | TermSubtract (a, b)
 	| TermShiftLeft (a, b) | TermShiftRight (a, b) | TermBitwiseAnd (a, b) | TermBitwiseXOr (a, b) | TermBitwiseOr (a, b)
 	-> (match (typeOf env a), (typeOf env b) with
 		| TypeNum, TypeNum -> TypeNum
-		| _ -> raise (TypeError "Binary Operation"))
+		| _ -> raise (TypeError ("Two Numbers are required, given " ^ (type_to_string (typeOf env a)) ^ " and " ^ (type_to_string (typeOf env b)) ^ ".")))
 
 	| TermScope a -> typeOf (extend env) a
 
@@ -67,7 +67,7 @@ let rec typeOf env e = flush_all(); match e with
 
 	| TermReBind (x, e) -> (match ((typeOf env e) = (lookup env x)) with
 		| true  -> typeOf env e
-		| false -> raise (TypeError "Rebind"))
+		| false -> raise (TypeError ("You cannot rebind variable to a different type. Use <type> <ident> = <value> instead!")))
 
 	| TermUnBind x -> lookup env x
 
@@ -77,7 +77,7 @@ let rec typeOf env e = flush_all(); match e with
 		| TypeFun (tT, tU) -> (
  			match tT = typeOf env b with
 				| true -> tT
-				| false -> raise (TypeError "Apply")
+				| false -> raise (TypeError "Function has a different type than expected")
 				)
 		| _ -> raise (TypeError (Printf.sprintf "While binding got %s which is not a function" (type_to_string (typeOf env a)))))
 

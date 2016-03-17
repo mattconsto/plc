@@ -5,10 +5,10 @@
 }
 rule lexer = parse
 	(* whitespace *)
-	| [' ''\t''\n''\r']                                                           { lexer lexbuf }
-
 	| "//"                                                                        { ignore (read_line_comment (Buffer.create 1000) lexbuf); lexer lexbuf }
 	| '/'[' ''\t''\n''\r']*'*'                                                    { ignore (read_block_comment (Buffer.create 1000) lexbuf); lexer lexbuf }
+
+	| [' ''\t''\n''\r']                                                           { lexer lexbuf }
 
 	(* Identifier *)
 	| "⊤" | "true"  | "True"                                                      { TRUE }
