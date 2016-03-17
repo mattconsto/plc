@@ -88,7 +88,20 @@ let rec eval co ce ci env e = flush_all (); match e with
 	| TermLessThanEqual (a, b) -> (match eval co ce ci env a, eval co ce ci env b with TermNum n, TermNum m -> TermNum(if n <= m then -1 else 0) | _ -> raise (StuckTerm "Less than Equal"))
 	| TermMoreThan      (a, b) -> (match eval co ce ci env a, eval co ce ci env b with TermNum n, TermNum m -> TermNum(if n >  m then -1 else 0) | _ -> raise (StuckTerm "More than"))
 	| TermMoreThanEqual (a, b) -> (match eval co ce ci env a, eval co ce ci env b with TermNum n, TermNum m -> TermNum(if n >= m then -1 else 0) | _ -> raise (StuckTerm "More than Equal"))
-	| TermEqual         (a, b) -> (match eval co ce ci env a, eval co ce ci env b with TermNum n, TermNum m -> TermNum(if n =  m then -1 else 0) | _ -> raise (StuckTerm "Equal"))
+	| TermEqual         (a, b) -> (match eval co ce ci env a, eval co ce ci env b with
+		| TermNum  n, TermNum  m -> TermNum(if n =  m then -1 else 0)
+		| TermPair (n1, n2), TermPair (m1, m2) -> let rec pairs_equal j k = (match eval co ce ci env j, eval co ce ci env k with
+				| TermPair(TermNum o, TermNum p), TermPair(TermNum q, TermNum r) -> o == q && p == r
+				| TermPair(TermNum o, TermUnit),  TermPair(TermNum q, TermUnit)  -> o == q
+				| TermPair(TermUnit,  TermNum p), TermPair(TermUnit,  TermNum r) -> p == r
+				| TermPair(TermNum o, p),         TermPair(TermNum q, r)         -> o == q && (pairs_equal p r)
+				| TermPair(TermUnit,  p),         TermPair(TermUnit,  r)         -> pairs_equal p r
+				| TermPair(o, TermNum p),         TermPair(q, TermNum r)         -> (pairs_equal o q) && p == r
+				| TermPair(o, TermUnit),          TermPair(q, TermUnit)          -> (pairs_equal o q)
+				| TermPair(o, p), TermPair(q, r)                                 -> (pairs_equal o p) && (pairs_equal q r)
+				| y, z                                                           -> false)
+			in TermNum (if pairs_equal (TermPair (n1, n2)) (TermPair (m1, m2)) then -1 else 0)
+		| _ -> raise (StuckTerm "Equal"))
 	| TermNotEqual      (a, b) -> (match eval co ce ci env a, eval co ce ci env b with TermNum n, TermNum m -> TermNum(if n != m then -1 else 0) | _ -> raise (StuckTerm "Not Equal"))
 
 	| TermUnaryNot       a     -> (match eval co ce ci env a with TermNum n -> TermNum(lnot n) | _ -> raise (StuckTerm "Unary Not"))
@@ -177,6 +190,7 @@ let rec eval co ce ci env e = flush_all (); match e with
 	| TermContinue             -> raise LoopContinue
 	| TermExit           p     -> raise (Terminated (eval co ce ci env p))
 
+	| TermPair          (a, b) -> TermPair(a, b)
 	| TermCons          (a, b) -> (match eval co ce ci env a, eval co ce ci env b with n, m -> TermPair(n, m))
 	| TermConsFirst     (a, b) -> (match eval co ce ci env a, eval co ce ci env b with n, m -> n)
 	| TermConsLast      (a, b) -> (match eval co ce ci env a, eval co ce ci env b with n, m -> m)
@@ -230,9 +244,6 @@ let rec eval co ce ci env e = flush_all (); match e with
 														| TermUnit -> (eval co ce ci env result)
 														| _ -> raise (StuckTerm "Fold")) in
 													fold (eval co ce ci env f) (eval co ce ci env d) (eval co ce ci env n))
-
-	| TermUnit -> TermUnit
-	| _ -> raise (StuckTerm "Unknown")
 
 	| TermUnit                 -> TermUnit
 	| a                        -> raise (NonBaseTypeResult a)

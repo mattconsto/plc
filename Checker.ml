@@ -20,7 +20,12 @@ let rec typeOf env e = flush_all(); match e with
 
 	| TermRandom (a, b) -> TypeNum
 
-	| TermLessThan (a, b) | TermLessThanEqual (a, b) | TermMoreThan (a, b) | TermMoreThanEqual (a, b) | TermEqual (a, b) | TermNotEqual (a, b)
+	| TermEqual (a, b) -> (match (typeOf env a), (typeOf env b) with
+		| TypeNum,  TypeNum  -> TypeNum
+		| TypePair _, TypePair _ -> TypeNum
+		| _ -> raise (TypeError ("Two Numbers/Pairs are required, given " ^ (type_to_string (typeOf env a)) ^ " and " ^ (type_to_string (typeOf env b)) ^ ".")))
+
+	| TermLessThan (a, b) | TermLessThanEqual (a, b) | TermMoreThan (a, b) | TermMoreThanEqual (a, b) | TermNotEqual (a, b)
 	-> (match (typeOf env a), (typeOf env b) with
 		| TypeNum, TypeNum -> TypeNum
 		| _ -> raise (TypeError ("Two Numbers are required, given " ^ (type_to_string (typeOf env a)) ^ " and " ^ (type_to_string (typeOf env b)) ^ ".")))
