@@ -245,5 +245,12 @@ let rec eval co ce ci env e = flush_all (); match e with
 														| _ -> raise (StuckTerm "Fold")) in
 													fold (eval co ce ci env f) (eval co ce ci env d) (eval co ce ci env n))
 
+	| TermLimit (l,n) -> (let rec limit l n r =
+													match l, n with
+														| (TermPair(head,tail), TermNum n) when n > 0 -> limit tail (TermNum (n-1)) (head :: r)
+														| (_, TermNum 0) | (TermUnit, _) -> List.rev r
+														| (_,_) -> raise (StuckTerm "Limit") in
+												TermList (limit (eval co ce ci env l) (eval co ce ci env n) []))
+
 	| TermUnit                 -> TermUnit
 	| a                        -> raise (NonBaseTypeResult a)
