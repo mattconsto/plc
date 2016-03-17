@@ -94,11 +94,11 @@ let global_types  = (extend Head:aquaType environment)
 let global_values = (extend Head:aquaTerm environment)
 
 let rec type_to_string aquaType = match aquaType with
-	| TypeUnit        -> "TypeUnit"
-	| TypeNum         -> "TypeNum"
-	| TypePair (a, b) -> Printf.sprintf "TypePair<%s, %s>" (type_to_string a) (type_to_string b)
-	| TypeList a      -> Printf.sprintf "TypeList<%s>" (type_to_string a)
-	| TypeFun (a, b)  -> Printf.sprintf "TypeFun<%s, %s>" (type_to_string a) (type_to_string b)
+	| TypeUnit        -> "Unit"
+	| TypeNum         -> "Number"
+	| TypePair (a, b) -> Printf.sprintf "Pair<%s, %s>" (type_to_string a) (type_to_string b)
+	| TypeList a      -> Printf.sprintf "List<%s>" (type_to_string a)
+	| TypeFun (a, b)  -> Printf.sprintf "Lambda<%s, %s>" (type_to_string a) (type_to_string b)
 
 let term_to_string aquaTerm = match aquaTerm with
 	| TermUnit -> "TermUnit"
