@@ -102,6 +102,22 @@ let rec eval co ce ci env e = flush_all (); match e with
 	| TermPlus          (a, b) -> (match eval co ce ci env a, eval co ce ci env b with TermNum n, TermNum m -> TermNum(n + m)   | n, m -> raise (StuckTerm ("Plus")))
 	| TermSubtract      (a, b) -> (match eval co ce ci env a, eval co ce ci env b with TermNum n, TermNum m -> TermNum(n - m)   | _ -> raise (StuckTerm "Subtract"))
 
+	| TermStringLower    a     -> (let rec convert s acc = match s with
+		| TermUnit                -> acc
+		| TermPair (TermNum n, o) -> convert o (TermPair (TermNum (Char.code (Char.lowercase (Char.chr n))), acc))
+		| a                       -> raise (NonBaseTypeResult a)
+	in convert (eval co ce ci env a) TermUnit)
+	| TermStringUpper    a     -> (let rec convert s acc = match s with
+		| TermUnit                -> acc
+		| TermPair (TermNum n, o) -> convert o (TermPair (TermNum (Char.code (Char.uppercase (Char.chr n))), acc))
+		| a                       -> raise (NonBaseTypeResult a)
+	in convert (eval co ce ci env a) TermUnit)
+	| TermStringRev    a     -> (let rec convert s acc = match s with
+		| TermUnit                -> acc
+		| TermPair (TermNum n, o) -> convert o (TermPair ((TermNum n), acc))
+		| a                       -> raise (NonBaseTypeResult a)
+	in convert (eval co ce ci env a) TermUnit)
+
 	| TermMathMin       (a, b) -> (match eval co ce ci env a, eval co ce ci env b with TermNum n, TermNum m -> TermNum(if n < m then n else m) | _ -> raise (StuckTerm "Min"))
 	| TermMathMax       (a, b) -> (match eval co ce ci env a, eval co ce ci env b with TermNum n, TermNum m -> TermNum(if n > m then n else m) | _ -> raise (StuckTerm "Max"))
 	| TermMathAbs        a     -> (match eval co ce ci env a with TermNum n -> TermNum(abs n) | _ -> raise (StuckTerm "Abs"))

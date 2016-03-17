@@ -7,7 +7,7 @@
 %token <string> IDENT
 %token <string> STRING
 
-%token MATH_MIN MATH_MAX MATH_ABS MATH_SIGN MATH_SQRT MATH_LOG MATH_LN MATH_FACT
+%token STRING_LOWER STRING_UPPER STRING_REV MATH_MIN MATH_MAX MATH_ABS MATH_SIGN MATH_SQRT MATH_LOG MATH_LN MATH_FACT
 %token MINUS PLUS
 %token UNARY_NEGATION
 %token BINARY_POWER BINARY_MULTIPLY BINARY_DIVIDE BINARY_MODULO
@@ -34,7 +34,7 @@
 %right FUNTYPE
 %left UNBIND IN IF THEN ELSE FUN MATCH WHILE DONE DO LOOP FOR DONE BREAK CONTINUE RETURN ASSERT EXIT CONS HEAD TAIL CLEAR PRINT_INT PRINT_STRING PRINT_BOOL PRINTLN_INT PRINTLN_STRING PRINTLN_BOOL ERROR_INT ERROR_STRING ERROR_BOOL ERRORLN_INT ERRORLN_STRING ERRORLN_BOOL READ_INT READ_STRING READ_BOOL RANDOM
 %left IDENT STRING
-%left MATH_MIN MATH_MAX MATH_ABS MATH_SIGN MATH_SQRT MATH_LOG MATH_LN MATH_FACT
+%left STRING_LOWER STRING_UPPER STRING_REV MATH_MIN MATH_MAX MATH_ABS MATH_SIGN MATH_SQRT MATH_LOG MATH_LN MATH_FACT
 %left TRUE FALSE
 %left ASSIGN_EQUAL ASSIGN_ADDITION ASSIGN_SUBTRACT ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MODULO ASSIGN_AND ASSIGN_XOR ASSIGN_OR
 %left QUESTION COLON
@@ -104,10 +104,14 @@ expr:
 	| ROUNDL expr ROUNDR                               { $2 }
 	| CURLYL exprs CURLYR                              { TermScope $2 }
 
-	| MAP expr expr																		 { TermMap ($2, $3) }
-	| FILTER expr expr																 { TermFilter ($2, $3) }
-	| FOLD expr expr expr															 { TermFold ($2, $3, $4) }
-	| LIMIT expr expr																 	 { TermLimit ($2, $3) }
+	| STRING_LOWER expr                                { TermStringRev (TermStringLower $2) }
+	| STRING_UPPER expr                                { TermStringRev (TermStringUpper $2) }
+	| STRING_REV expr                                  { TermStringRev $2 }
+
+	| MAP expr expr                                    { TermMap ($2, $3) }
+	| FILTER expr expr                                 { TermFilter ($2, $3) }
+	| FOLD expr expr                                   { TermFold ($2, $3) }
+	| LIMIT expr expr                                  { TermLimit ($2, $3) }
 
 	| list                                             { $1 }
 	| data                                             { $1 }
@@ -221,4 +225,4 @@ io:
 
 	| RANDOM expr expr                                 { TermRandom ($2, $3) }
 	| RANDOM expr                                      { TermRandom (TermNum 0, $2) }
-	| RANDOM                                           { TermRandom (TermNum 0, TermNum 1) }
+	| RANDOM                                           { TermRandom (TermNum (-1), TermNum 0) }
