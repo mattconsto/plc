@@ -103,7 +103,7 @@ expr:
 
 	| MAP expr expr																		 { TermMap ($2, $3) }
 	| FILTER expr expr																 { TermFilter ($2, $3) }
-	| FOLD expr expr																	 { TermFold ($2, $3) }
+	| FOLD expr expr expr															 { TermFold ($2, $3, $4) }
 	| LIMIT expr expr																 	 { TermLimit ($2, $3) }
 
 	| list                                             { $1 }

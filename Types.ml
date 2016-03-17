@@ -70,7 +70,7 @@ type aquaTerm =
 	| TermApply of aquaTerm * aquaTerm
 
 	| TermMap of aquaTerm * aquaTerm
-	| TermFold of aquaTerm * aquaTerm
+	| TermFold of aquaTerm * aquaTerm * aquaTerm
 	| TermFilter of aquaTerm * aquaTerm
 	| TermLimit of aquaTerm * aquaTerm
 
