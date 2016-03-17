@@ -181,6 +181,10 @@ let term_to_string aquaTerm = match aquaTerm with
 	| TermHead _ -> "TermHead"
 	| TermTail _ -> "TermTail"
 	| TermLength _ -> "TermLength"
+	| TermMap _ -> "TermMap"
+	| TermFold _ -> "TermFold"
+	| TermFilter _ -> "TermFilter"
+	| TermLimit _ -> "TermLimit"
 
 	| TermVar _ -> "TermVar"
 	| TermIf _ -> "TermIf"

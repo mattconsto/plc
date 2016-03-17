@@ -253,4 +253,3 @@ let rec eval co ce ci env e = flush_all (); match e with
 												TermList (limit (eval co ce ci env l) (eval co ce ci env n) []))
 
 	| TermUnit                 -> TermUnit
-	| a                        -> raise (NonBaseTypeResult a)
