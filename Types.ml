@@ -28,6 +28,15 @@ type aquaTerm =
 	| TermPlus of aquaTerm * aquaTerm
 	| TermSubtract of aquaTerm * aquaTerm
 
+	| TermMathMin of aquaTerm * aquaTerm
+	| TermMathMax of aquaTerm * aquaTerm
+	| TermMathAbs of aquaTerm
+	| TermMathSign of aquaTerm
+	| TermMathSqrt of aquaTerm
+	| TermMathLog of aquaTerm
+	| TermMathLn of aquaTerm
+	| TermMathFact of aquaTerm
+
 	| TermShiftLeft of aquaTerm * aquaTerm
 	| TermShiftRight of aquaTerm * aquaTerm
 	| TermBitwiseAnd of aquaTerm * aquaTerm
@@ -49,9 +58,15 @@ type aquaTerm =
 	| TermReadString
 	| TermReadBool
 
+	| TermClear
+
 	| TermPrintInt of aquaTerm
 	| TermPrintString of aquaTerm
 	| TermPrintBool of aquaTerm
+
+	| TermErrorInt of aquaTerm
+	| TermErrorString of aquaTerm
+	| TermErrorBool of aquaTerm
 
 	| TermRandom of aquaTerm * aquaTerm
 
@@ -66,6 +81,7 @@ type aquaTerm =
 	| TermIf of aquaTerm * aquaTerm * aquaTerm
 	| TermBind of string * aquaType * aquaTerm
 	| TermReBind of string * aquaTerm
+	| TermUnBind of string
 	| TermLambda of string * aquaTerm environment * aquaType * aquaTerm
 	| TermApply of aquaTerm * aquaTerm
 
@@ -73,8 +89,6 @@ type aquaTerm =
 	| TermFold of aquaTerm * aquaTerm * aquaTerm
 	| TermFilter of aquaTerm * aquaTerm
 	| TermLimit of aquaTerm * aquaTerm
-
-
 
 let global_types  = (extend Head:aquaType environment)
 let global_values = (extend Head:aquaTerm environment)
@@ -111,6 +125,15 @@ let term_to_string aquaTerm = match aquaTerm with
 	| TermPlus _ -> "TermPlus"
 	| TermSubtract _ -> "TermSubtract"
 
+	| TermMathMin _ -> "TermMathMin"
+	| TermMathMax _ -> "TermMathMax"
+	| TermMathAbs _ -> "TermMathAbs"
+	| TermMathSign _ -> "TermMathSign"
+	| TermMathSqrt _ -> "TermMathSqrt"
+	| TermMathLog _ -> "TermMathLog"
+	| TermMathLn _ -> "TermMathLn"
+	| TermMathFact _ -> "TermMathFact"
+
 	| TermShiftLeft _ -> "TermShiftLeft"
 	| TermShiftRight _ -> "TermShiftRight"
 	| TermBitwiseAnd _ -> "TermBitwiseAnd"
@@ -132,9 +155,15 @@ let term_to_string aquaTerm = match aquaTerm with
 	| TermReadString -> "TermReadString"
 	| TermReadBool -> "TermReadBool"
 
+	| TermClear -> "TermClear"
+
 	| TermPrintInt _ -> "TermPrintInt"
 	| TermPrintString _ -> "TermPrintString"
 	| TermPrintBool _ -> "TermPrintBool"
+
+	| TermErrorInt _ -> "TermErrorInt"
+	| TermErrorString _ -> "TermErrorString"
+	| TermErrorBool _ -> "TermErrorBool"
 
 	| TermRandom _ -> "TermRandom"
 
@@ -149,5 +178,6 @@ let term_to_string aquaTerm = match aquaTerm with
 	| TermIf _ -> "TermIf"
 	| TermBind _ -> "TermBind"
 	| TermReBind _ -> "TermReBind"
+	| TermUnBind _ -> "TermRUnBind"
 	| TermLambda _ -> "TermLambda"
 	| TermApply _ -> "TermApply"

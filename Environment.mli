@@ -1,5 +1,5 @@
 (* Thrown if and only if, we reach the Head node of our tree *)
-exception EnvironmentReachedHead
+exception EnvironmentReachedHead of string
 
 (* Type of Environments *)
 type 'a environment = Env of 'a environment * (string * 'a ref) list ref | Head

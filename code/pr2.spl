@@ -6,7 +6,7 @@
 	This is achieved by reading, caching, building a list then outputing it.
  */
 
-while true do {
-	int cache = read_int;
-	println_int [cache, cache];
+loop {
+	int cache = console.read_int;
+	console.println_int [cache, cache];
 }

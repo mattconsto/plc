@@ -10,13 +10,13 @@ let rec typeOf env e = flush_all(); match e with
 	| TermNum       n -> TypeNum
 	| TermPair (a, b) -> TypePair ((typeOf env a), (typeOf env b))
 	| TermList      a -> TypeList (typeOf env (List.hd a))
-	| TermVar       x -> (try lookup env x with EnvironmentReachedHead -> raise (TypeError ("Variable: " ^ x)))
+	| TermVar       x -> (try lookup env x with EnvironmentReachedHead e -> raise (TypeError ("Variable: " ^ x)))
 	| TermString    s -> TypePair (TypeNum, TypeNum)
 
-	| TermReadInt     -> TypeNum
-	| TermReadString  -> TypeNum
-	| TermReadBool    -> TypeNum
+	| TermReadInt | TermReadString | TermReadBool -> TypeNum
+	| TermClear -> TypeUnit
 	| TermPrintString a | TermPrintInt a | TermPrintBool a -> TypeUnit
+	| TermErrorString a | TermErrorInt a | TermErrorBool a -> TypeUnit
 
 	| TermRandom (a, b) -> TypeNum
 
@@ -29,10 +29,12 @@ let rec typeOf env e = flush_all(); match e with
 		| TypeNum -> TypeNum
 		| _ -> raise (TypeError "Unary Not"))
 
+	| TermMathAbs a | TermMathSign a | TermMathSqrt a | TermMathLog a | TermMathLn a | TermMathFact a
 	| TermUnaryMinus a | TermUnaryPlus a -> (match (typeOf env a) with
 		| TypeNum -> TypeNum
 		| _ -> raise (TypeError "Unary Operation"))
 
+	| TermMathMin (a, b) | TermMathMax (a, b)
 	| TermPower (a, b) | TermMultiply (a, b) | TermDivide (a, b) | TermModulo (a, b) | TermPlus (a, b) | TermSubtract (a, b)
 	| TermShiftLeft (a, b) | TermShiftRight (a, b) | TermBitwiseAnd (a, b) | TermBitwiseXOr (a, b) | TermBitwiseOr (a, b)
 	-> (match (typeOf env a), (typeOf env b) with
@@ -66,6 +68,8 @@ let rec typeOf env e = flush_all(); match e with
 	| TermReBind (x, e) -> (match ((typeOf env e) = (lookup env x)) with
 		| true  -> typeOf env e
 		| false -> raise (TypeError "Rebind"))
+
+	| TermUnBind x -> lookup env x
 
 	| TermLambda (x, old, t, e) -> TypeFun(t, typeOf (bind env x t) e)
 

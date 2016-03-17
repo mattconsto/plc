@@ -7,6 +7,7 @@
 %token <string> IDENT
 %token <string> STRING
 
+%token MATH_MIN MATH_MAX MATH_ABS MATH_SIGN MATH_SQRT MATH_LOG MATH_LN MATH_FACT
 %token MINUS PLUS
 %token UNARY_NEGATION
 %token BINARY_POWER BINARY_MULTIPLY BINARY_DIVIDE BINARY_MODULO
@@ -16,7 +17,7 @@
 %token ASSIGN_EQUAL ASSIGN_ADDITION ASSIGN_SUBTRACT ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MODULO ASSIGN_AND ASSIGN_XOR ASSIGN_OR
 
 %token TRUE FALSE
-%token IN IF THEN ELSE FUN MATCH WHILE DONE DO DONE FOR BREAK CONTINUE RETURN ASSERT EXIT CONS HEAD TAIL PRINT_INT PRINT_STRING PRINT_BOOL PRINTLN_INT PRINTLN_STRING PRINTLN_BOOL READ_INT READ_STRING READ_BOOL RANDOM LENGTH
+%token UNBIND IN IF THEN ELSE FUN MATCH WHILE DONE DO LOOP DONE FOR BREAK CONTINUE RETURN ASSERT EXIT CONS HEAD TAIL CLEAR PRINT_INT PRINT_STRING PRINT_BOOL PRINTLN_INT PRINTLN_STRING PRINTLN_BOOL ERROR_INT ERROR_STRING ERROR_BOOL ERRORLN_INT ERRORLN_STRING ERRORLN_BOOL READ_INT READ_STRING READ_BOOL RANDOM LENGTH
 
 %token LAMBDA ROUNDL ROUNDR UTYPE ITYPE LTYPE PTYPE FUNTYPE
 %token MAP FOLD FILTER LIMIT
@@ -31,8 +32,9 @@
 
 /* Low */
 %right FUNTYPE
-%left IN IF THEN ELSE FUN MATCH WHILE DONE DO FOR DONE BREAK CONTINUE RETURN ASSERT EXIT CONS HEAD TAIL PRINT_INT PRINT_STRING PRINT_BOOL PRINTLN_INT PRINTLN_STRING PRINTLN_BOOL READ_INT READ_STRING READ_BOOL RANDOM
+%left UNBIND IN IF THEN ELSE FUN MATCH WHILE DONE DO LOOP FOR DONE BREAK CONTINUE RETURN ASSERT EXIT CONS HEAD TAIL CLEAR PRINT_INT PRINT_STRING PRINT_BOOL PRINTLN_INT PRINTLN_STRING PRINTLN_BOOL ERROR_INT ERROR_STRING ERROR_BOOL ERRORLN_INT ERRORLN_STRING ERRORLN_BOOL READ_INT READ_STRING READ_BOOL RANDOM
 %left IDENT STRING
+%left MATH_MIN MATH_MAX MATH_ABS MATH_SIGN MATH_SQRT MATH_LOG MATH_LN MATH_FACT
 %left TRUE FALSE
 %left ASSIGN_EQUAL ASSIGN_ADDITION ASSIGN_SUBTRACT ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MODULO ASSIGN_AND ASSIGN_XOR ASSIGN_OR
 %left QUESTION COLON
@@ -96,6 +98,7 @@ expr:
 	| EXIT expr                                        { TermExit $2 }
 	| EXIT                                             { TermExit (TermNum 0) }
 
+	| UNBIND IDENT                                     { TermUnBind $2 }
 	| LAMBDA ROUNDL type_spec IDENT ROUNDR expr        { TermLambda ($4, global_values, $3, $6) }
 	| expr ROUNDL expr ROUNDR                          { TermApply ($1, $3) }
 	| ROUNDL expr ROUNDR                               { $2 }
@@ -132,21 +135,22 @@ list_inner:
 
 loop:
 	| WHILE expr DO expr                               { TermWhile ($2, $4) }
+	| LOOP expr                                        { TermWhile (TermUnaryNot (TermNum 0), $2) }
 	| DO expr WHILE expr                               { TermDo ($4, $2) }
 	| FOR assign SEMI_COLON expr SEMI_COLON expr THEN expr  { TermFor ($2, $4, $6, $8)}
 
 assign:
-	| type_spec IDENT ASSIGN_EQUAL expr            { TermBind ($2, $1, $4) }
+	| type_spec IDENT ASSIGN_EQUAL expr                { TermBind ($2, $1, $4) }
 
-	| IDENT ASSIGN_EQUAL expr                      { TermReBind ($1, $3) }
-	| IDENT ASSIGN_ADDITION expr                   { TermReBind ($1, TermPlus ((TermVar $1), $3)) }
-	| IDENT ASSIGN_SUBTRACT expr                   { TermReBind ($1, TermSubtract ((TermVar $1), $3)) }
-	| IDENT ASSIGN_MULTIPLY expr                   { TermReBind ($1, TermMultiply ((TermVar $1), $3)) }
-	| IDENT ASSIGN_DIVIDE expr                     { TermReBind ($1, TermDivide ((TermVar $1), $3)) }
-	| IDENT ASSIGN_MODULO expr                     { TermReBind ($1, TermModulo ((TermVar $1), $3)) }
-	| IDENT ASSIGN_AND expr                        { TermReBind ($1, TermBitwiseAnd ((TermVar $1), $3)) }
-	| IDENT ASSIGN_XOR expr                        { TermReBind ($1, TermBitwiseXOr ((TermVar $1), $3)) }
-	| IDENT ASSIGN_OR expr                         { TermReBind ($1, TermBitwiseOr ((TermVar $1), $3)) }
+	| IDENT ASSIGN_EQUAL expr                          { TermReBind ($1, $3) }
+	| IDENT ASSIGN_ADDITION expr                       { TermReBind ($1, TermPlus ((TermVar $1), $3)) }
+	| IDENT ASSIGN_SUBTRACT expr                       { TermReBind ($1, TermSubtract ((TermVar $1), $3)) }
+	| IDENT ASSIGN_MULTIPLY expr                       { TermReBind ($1, TermMultiply ((TermVar $1), $3)) }
+	| IDENT ASSIGN_DIVIDE expr                         { TermReBind ($1, TermDivide ((TermVar $1), $3)) }
+	| IDENT ASSIGN_MODULO expr                         { TermReBind ($1, TermModulo ((TermVar $1), $3)) }
+	| IDENT ASSIGN_AND expr                            { TermReBind ($1, TermBitwiseAnd ((TermVar $1), $3)) }
+	| IDENT ASSIGN_XOR expr                            { TermReBind ($1, TermBitwiseXOr ((TermVar $1), $3)) }
+	| IDENT ASSIGN_OR expr                             { TermReBind ($1, TermBitwiseOr ((TermVar $1), $3)) }
 
 conditional:
 	| IF expr THEN expr ELSE expr DONE                 { TermIf ($2, $4, $6) }
@@ -159,7 +163,17 @@ unary:
 	| MINUS expr                                       { TermUnaryMinus $2 }
 	| PLUS expr                                        { TermUnaryPlus $2 }
 
+	| MATH_ABS expr                                    { TermMathAbs $2 }
+	| MATH_SIGN expr                                   { TermMathSign $2 }
+	| MATH_SQRT expr                                   { TermMathSqrt $2 }
+	| MATH_LOG expr                                    { TermMathLog $2 }
+	| MATH_LN expr                                     { TermMathLn $2 }
+	| MATH_FACT expr                                   { TermMathFact $2 }
+
 binary:
+	| MATH_MIN expr expr                               { TermMathMin ($2, $3) }
+	| MATH_MAX expr expr                               { TermMathMax ($2, $3) }
+
 	| expr BINARY_POWER expr                           { TermPower ($1, $3) }
 	| expr BINARY_MULTIPLY expr                        { TermMultiply ($1, $3) }
 	| expr BINARY_DIVIDE expr                          { TermDivide ($1, $3) }
@@ -187,6 +201,8 @@ io:
 	| READ_STRING                                      { TermReadString }
 	| READ_BOOL                                        { TermReadBool }
 
+	| CLEAR                                            { TermClear }
+
 	| PRINT_INT expr                                   { TermPrintInt $2 }
 	| PRINT_STRING expr                                { TermPrintString $2 }
 	| PRINT_BOOL expr                                  { TermPrintBool $2 }
@@ -194,6 +210,14 @@ io:
 	| PRINTLN_INT expr                                 { TermCons(TermPrintInt $2, TermPrintString (TermNum 10)) }
 	| PRINTLN_STRING expr                              { TermCons(TermPrintString $2, TermPrintString (TermNum 10)) }
 	| PRINTLN_BOOL expr                                { TermCons(TermPrintBool $2, TermPrintString (TermNum 10)) }
+
+	| ERROR_INT expr                                   { TermErrorInt $2 }
+	| ERROR_STRING expr                                { TermErrorString $2 }
+	| ERROR_BOOL expr                                  { TermErrorBool $2 }
+
+	| ERRORLN_INT expr                                 { TermCons(TermErrorInt $2, TermErrorString (TermNum 10)) }
+	| ERRORLN_STRING expr                              { TermCons(TermErrorString $2, TermErrorString (TermNum 10)) }
+	| ERRORLN_BOOL expr                                { TermCons(TermErrorBool $2, TermErrorString (TermNum 10)) }
 
 	| RANDOM expr expr                                 { TermRandom ($2, $3) }
 	| RANDOM expr                                      { TermRandom (TermNum 0, $2) }

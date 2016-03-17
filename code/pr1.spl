@@ -14,8 +14,8 @@
 int cache = 0;
 
 // Execution halts on EOL
-while true do {
+loop {
 	// By printing first, when we reach EOL, we don't need to print what's copied.
-	println_int cache;
-	cache = read_int;
+	console.println_int cache;
+	cache = console.read_int;
 }

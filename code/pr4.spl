@@ -8,6 +8,6 @@
 
 int total = 0;
 
-while true do {
-	println_int (total += read_int);
+loop {
+	console.println_int (total += console.read_int);
 }

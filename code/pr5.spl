@@ -12,8 +12,8 @@ int a = 0;
 int b = 0;
 int t = 0;
 
-while true do {
-	println_int t = a + b + read_int;
+loop {
+	console.println_int t = a + b + console.read_int;
 	a = b;
 	b = t;
 }
