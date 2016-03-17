@@ -67,7 +67,7 @@ let rec typeOf env e = flush_all(); match e with
 		| true  -> typeOf env e
 		| false -> raise (TypeError "Rebind"))
 
-	| TermLambda (x, t, e) -> TypeFun(t, typeOf (bind env x t) e)
+	| TermLambda (x, old, t, e) -> TypeFun(t, typeOf (bind env x t) e)
 
 	| TermApply (a, b) -> (	match typeOf env a with
 		| TypeFun (tT, tU) -> (
@@ -78,6 +78,6 @@ let rec typeOf env e = flush_all(); match e with
 		| _ -> raise (TypeError (Printf.sprintf "While binding got %s which is not a function" (type_to_string (typeOf env a)))))
 
 	| TermMap (f, l) -> ( match (f, typeOf env l) with
-												| (TermLambda (x,t,e), TypePair (h,r)) -> TypeList h
-												| (TermLambda (x,t,e), TypeUnit) 			 -> TypeUnit
+												| (TermLambda (x,old,t,e), TypePair (h,r)) -> TypeList h
+												| (TermLambda (x,old,t,e), TypeUnit) 			 -> TypeUnit
 												| (_, _) 															 -> raise (TypeError "Map"))

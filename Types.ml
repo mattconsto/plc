@@ -1,3 +1,5 @@
+open Environment
+
 type aquaType = TypeUnit | TypeNum | TypePair of aquaType * aquaType | TypeList of aquaType | TypeFun of aquaType * aquaType
 
 (* Grammar of the language *)
@@ -64,13 +66,18 @@ type aquaTerm =
 	| TermIf of aquaTerm * aquaTerm * aquaTerm
 	| TermBind of string * aquaType * aquaTerm
 	| TermReBind of string * aquaTerm
-	| TermLambda of string * aquaType * aquaTerm
+	| TermLambda of string * aquaTerm environment * aquaType * aquaTerm
 	| TermApply of aquaTerm * aquaTerm
 
 	| TermMap of aquaTerm * aquaTerm
 	| TermFold of aquaTerm * aquaTerm
 	| TermFilter of aquaTerm * aquaTerm
 	| TermLimit of aquaTerm * aquaTerm
+
+
+
+let global_types  = (extend Head:aquaType environment)
+let global_values = (extend Head:aquaTerm environment)
 
 let rec type_to_string aquaType = match aquaType with
 	| TypeUnit        -> "TypeUnit"
@@ -136,6 +143,7 @@ let term_to_string aquaTerm = match aquaTerm with
 	| TermConsLast _ -> "TermConsLast"
 	| TermHead _ -> "TermHead"
 	| TermTail _ -> "TermTail"
+	| TermLength _ -> "TermLength"
 
 	| TermVar _ -> "TermVar"
 	| TermIf _ -> "TermIf"

@@ -16,8 +16,9 @@ let rec result_to_int res = match res with
 	| TermPair(a, b) -> (match b with
 		| TermUnit -> (result_to_int a)
 		| _      -> (result_to_int a) ^ " " ^ (result_to_int b))
-	| TermLambda(x, t, a) -> Printf.sprintf "lambda (%s)" x
+	| TermLambda(x, old, t, a) -> Printf.sprintf "lambda (%s)" x
 	| TermList l -> (let rec printlist l s = match l with (h :: t) -> printlist t (s ^ " " ^ (result_to_int h)) | [] -> s in printlist l "")
+	| TermLambda(x, env, t, a) -> Printf.sprintf "lambda (%s)" x
 	| a -> raise (NonBaseTypeResult a)
 
 let rec result_to_string res = match res with
@@ -26,7 +27,7 @@ let rec result_to_string res = match res with
 	| TermPair(a, b) -> (match b with
 		| TermUnit -> (result_to_string a)
 		| _      -> (result_to_string a) ^ (result_to_string b))
-	| TermLambda(x, t, a) -> Printf.sprintf "lambda (%s)" x
+	| TermLambda(x, env, t, a) -> Printf.sprintf "lambda (%s)" x
 	| a -> raise (NonBaseTypeResult a)
 
 let rec result_to_bool res = match res with
@@ -35,7 +36,7 @@ let rec result_to_bool res = match res with
 	| TermPair(a, b) -> (match b with
 		| TermUnit -> (result_to_bool a)
 		| _      -> (result_to_bool a) ^ " " ^ (result_to_bool b))
-	| TermLambda(x, t, a) -> Printf.sprintf "lambda (%s)" x
+	| TermLambda(x, env, t, a) -> Printf.sprintf "lambda (%s)" x
 	| a -> raise (NonBaseTypeResult a)
 
 let equality_test e = (match e with
@@ -171,12 +172,12 @@ let rec eval output error input env e = flush_all (); match e with
 	| TermReBind (x,  a)      -> let temp = eval output error input env a in (ignore (rebind env x temp); temp)
 
 	| TermApply (a, b) -> (match (eval output error input env a) with
-		| TermLambda(x, t, a) -> (try
+		| TermLambda(x, env, t, a) -> (try
 				let scope = extend env in (ignore (bind scope x (eval output error input scope b)); eval output error input scope a)
 			with Return a -> a)
 		| _ -> raise (StuckTerm "Apply"))
 
-	| TermLambda(x, t, a) -> TermLambda(x, t, a)
+	| TermLambda(x, old, t, a) -> TermLambda(x, env, t, a)
 
 	| TermMap (f,d) -> (let rec map func data result =
 												(match data with

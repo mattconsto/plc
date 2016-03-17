@@ -15,10 +15,10 @@ Language.cmx : Types.cmx Parser.cmx Lexer.cmx Evaluator.cmx Environment.cmx \
     Checker.cmx Language.cmi
 Lexer.cmo : Parser.cmi
 Lexer.cmx : Parser.cmx
-Parser.cmo : Types.cmo Parser.cmi
-Parser.cmx : Types.cmx Parser.cmi
-Types.cmo :
-Types.cmx :
+Parser.cmo : Types.cmo Language.cmi Parser.cmi
+Parser.cmx : Types.cmx Language.cmx Parser.cmi
+Types.cmo : Environment.cmi
+Types.cmx : Environment.cmx
 mysplinterpreter.cmo : Types.cmo Language.cmi Evaluator.cmi Environment.cmi \
     Checker.cmi
 mysplinterpreter.cmx : Types.cmx Language.cmx Evaluator.cmx Environment.cmx \

@@ -5,10 +5,10 @@
 }
 rule lexer = parse
 	(* whitespace *)
-	| [' ''\t''\n']                       { lexer lexbuf }
+	| [' ''\t''\n''\r']                   { lexer lexbuf }
 
 	| "//"                                { ignore (read_line_comment (Buffer.create 1000) lexbuf); lexer lexbuf }
-	| '/'[' ''\t''\n']*'*'                { ignore (read_block_comment (Buffer.create 1000) lexbuf); lexer lexbuf }
+	| '/'[' ''\t''\n''\r']*'*'            { ignore (read_block_comment (Buffer.create 1000) lexbuf); lexer lexbuf }
 
 	(* Identifier *)
 	| "⊤" | "true"  | "True"              { TRUE }
@@ -123,6 +123,7 @@ rule lexer = parse
 
 and read_string buf = parse
 	| '"'                                 { Buffer.contents buf }
+	| '\\' '"'                            { Buffer.add_char buf '"'; read_string buf lexbuf }
 	| '\\' '/'                            { Buffer.add_char buf '/'; read_string buf lexbuf }
 	| '\\' '\\'                           { Buffer.add_char buf '\\'; read_string buf lexbuf }
 	| '\\' 'b'                            { Buffer.add_char buf '\b'; read_string buf lexbuf }
@@ -135,11 +136,11 @@ and read_string buf = parse
 	| eof                                 { raise (SyntaxError ("String is not terminated!")) }
 
 and read_block_comment buf = parse
-	| '*'[' ''\t''\n']*'/'                { Buffer.contents buf }
+	| '*'[' ''\t''\n''\r']*'/'            { Buffer.contents buf }
 	| eof                                 { Buffer.contents buf }
 	| _                                   { Buffer.add_string buf (Lexing.lexeme lexbuf); read_block_comment buf lexbuf}
 
 and read_line_comment buf = parse
-	| [^'\n']*                            { Buffer.add_string buf (Lexing.lexeme lexbuf); read_line_comment buf lexbuf }
-	| '\n'                                { Buffer.contents buf }
+	| [^'\n''\r']*                        { Buffer.add_string buf (Lexing.lexeme lexbuf); read_line_comment buf lexbuf }
+	| ['\n''\r']                          { Buffer.contents buf }
 	| eof                                 { Buffer.contents buf }
