@@ -104,10 +104,10 @@ expr:
 	| ROUNDL expr ROUNDR                               { $2 }
 	| CURLYL exprs CURLYR                              { TermScope $2 }
 
-	| MAP expr expr																		 { TermMap ($2, $3) }
-	| FILTER expr expr																 { TermFilter ($2, $3) }
-	| FOLD expr expr																	 { TermFold ($2, $3) }
-	| LIMIT expr expr																 	 { TermLimit ($2, $3) }
+	| MAP expr expr                                    { TermMap ($2, $3) }
+	| FILTER expr expr                                 { TermFilter ($2, $3) }
+	| FOLD expr expr                                   { TermFold ($2, $3) }
+	| LIMIT expr expr                                  { TermLimit ($2, $3) }
 
 	| list                                             { $1 }
 	| data                                             { $1 }
@@ -140,17 +140,17 @@ loop:
 	| FOR assign SEMI_COLON expr SEMI_COLON expr THEN expr  { TermFor ($2, $4, $6, $8)}
 
 assign:
-	| type_spec IDENT ASSIGN_EQUAL expr            { TermBind ($2, $1, $4) }
+	| type_spec IDENT ASSIGN_EQUAL expr                { TermBind ($2, $1, $4) }
 
-	| IDENT ASSIGN_EQUAL expr                      { TermReBind ($1, $3) }
-	| IDENT ASSIGN_ADDITION expr                   { TermReBind ($1, TermPlus ((TermVar $1), $3)) }
-	| IDENT ASSIGN_SUBTRACT expr                   { TermReBind ($1, TermSubtract ((TermVar $1), $3)) }
-	| IDENT ASSIGN_MULTIPLY expr                   { TermReBind ($1, TermMultiply ((TermVar $1), $3)) }
-	| IDENT ASSIGN_DIVIDE expr                     { TermReBind ($1, TermDivide ((TermVar $1), $3)) }
-	| IDENT ASSIGN_MODULO expr                     { TermReBind ($1, TermModulo ((TermVar $1), $3)) }
-	| IDENT ASSIGN_AND expr                        { TermReBind ($1, TermBitwiseAnd ((TermVar $1), $3)) }
-	| IDENT ASSIGN_XOR expr                        { TermReBind ($1, TermBitwiseXOr ((TermVar $1), $3)) }
-	| IDENT ASSIGN_OR expr                         { TermReBind ($1, TermBitwiseOr ((TermVar $1), $3)) }
+	| IDENT ASSIGN_EQUAL expr                          { TermReBind ($1, $3) }
+	| IDENT ASSIGN_ADDITION expr                       { TermReBind ($1, TermPlus ((TermVar $1), $3)) }
+	| IDENT ASSIGN_SUBTRACT expr                       { TermReBind ($1, TermSubtract ((TermVar $1), $3)) }
+	| IDENT ASSIGN_MULTIPLY expr                       { TermReBind ($1, TermMultiply ((TermVar $1), $3)) }
+	| IDENT ASSIGN_DIVIDE expr                         { TermReBind ($1, TermDivide ((TermVar $1), $3)) }
+	| IDENT ASSIGN_MODULO expr                         { TermReBind ($1, TermModulo ((TermVar $1), $3)) }
+	| IDENT ASSIGN_AND expr                            { TermReBind ($1, TermBitwiseAnd ((TermVar $1), $3)) }
+	| IDENT ASSIGN_XOR expr                            { TermReBind ($1, TermBitwiseXOr ((TermVar $1), $3)) }
+	| IDENT ASSIGN_OR expr                             { TermReBind ($1, TermBitwiseOr ((TermVar $1), $3)) }
 
 conditional:
 	| IF expr THEN expr ELSE expr DONE                 { TermIf ($2, $4, $6) }
