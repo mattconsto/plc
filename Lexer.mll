@@ -19,13 +19,15 @@ rule lexer = parse
 	| "list" | "List"                     { LTYPE }
 	| "pair" | "Pair"                     { PTYPE }
 	| "->"   | "→" | "to" | "To"          { FUNTYPE }
-	| "\\l"  | "lambda" | "Lambda"        { LAMBDA }
+	| "\\l"  | "lambda" | "Lambda" | "function" | "Function"        { LAMBDA }
 
-	| "map"    | "Map"										{ MAP }
-	| "fold"   | "Fold" 									{ FOLD }
-	| "filter" | "Filter"									{ FILTER }
-	| "limit"	 | "Limit"									{ LIMIT }
+	| "list.map"    | "List.Map"										{ MAP }
+	| "list.fold"   | "List.Fold" 									{ FOLD }
+	| "list.filter" | "List.Filter"									{ FILTER }
+	| "list.limit"	 | "List.Limit"									{ LIMIT }
+	| "list.length"    | "List.Length" | "#"																	{ LENGTH }
 
+	| "unbind"    | "Unbind"              { UNBIND }
 	| "in"        | "In"                  { IN }
 	| "if"        | "If"                  { IF }
 	| "then"      | "Then"                { THEN }
@@ -35,6 +37,7 @@ rule lexer = parse
 	| "while"     | "While"               { WHILE }
 	| "done"      | "Done"                { DONE }
 	| "do"        | "Do"                  { DO }
+	| "loop"      | "Loop"                { LOOP }
 	| "for"       | "For"                 { FOR }
 	| "done"      | "Done"                { DONE }
 	| "break"     | "Break"               { BREAK }
@@ -45,21 +48,28 @@ rule lexer = parse
 	| "cons"      | "Cons"                { CONS }
 	| "head"      | "Head"                { HEAD }
 	| "tail"      | "Tail"                { TAIL }
-	| "#"																	{ LENGTH }
 
-	| "random"    | "Random"              { RANDOM }
+	| "math.random"    | "Math.Random"              { RANDOM }
 
-	| "read_int"     | "Read_Int"         { READ_INT }
-	| "read_string"  | "Read_String"      { READ_STRING }
-	| "read_bool"    | "Read_Bool"        { READ_BOOL }
+	| "console.read_int"     | "Console.Read_Int"         { READ_INT }
+	| "console.read_string"  | "Console.Read_String"      { READ_STRING }
+	| "console.read_bool"    | "Console.Read_Bool"        { READ_BOOL }
 
-	| "print_int"    | "Print_Int"        { PRINT_INT }
-	| "print_string" | "Print_String"     { PRINT_STRING }
-	| "print_bool"   | "Print_Bool"       { PRINT_BOOL }
+	| "console.print_int"    | "Console.Print_Int"        { PRINT_INT }
+	| "console.print_string" | "Console.Print_String"     { PRINT_STRING }
+	| "console.print_bool"   | "Console.Print_Bool"       { PRINT_BOOL }
 
-	| "println_int"    | "Println_Int"        { PRINTLN_INT }
-	| "println_string" | "Println_String"     { PRINTLN_STRING }
-	| "println_bool"   | "Println_Bool"       { PRINTLN_BOOL }
+	| "console.println_int"    | "Console.Println_Int"        { PRINTLN_INT }
+	| "console.println_string" | "Console.Println_String"     { PRINTLN_STRING }
+	| "console.println_bool"   | "Console.Println_Bool"       { PRINTLN_BOOL }
+
+	| "console.error_int"    | "Console.Error_Int"        { ERROR_INT }
+	| "console.error_string" | "Console.Error_String"     { ERROR_STRING }
+	| "console.error_bool"   | "Console.Error_Bool"       { ERROR_BOOL }
+
+	| "console.errorln_int"    | "Console.Errorln_Int"        { ERRORLN_INT }
+	| "console.errorln_string" | "Console.Errorln_String"     { ERRORLN_STRING }
+	| "console.errorln_bool"   | "Console.Errorln_Bool"       { ERRORLN_BOOL }
 
 	(* Brackets *)
 	| '{'                                 { CURLYL }
@@ -73,18 +83,18 @@ rule lexer = parse
 	| '?'                                 { QUESTION }
 
 
-	| '-'                                 { MINUS }
-	| '+'                                 { PLUS }
+	| '-' | "math.minus" | "Math.Minus"                        { MINUS }
+	| '+' | "math.plus"  | "Math.Plus"                              { PLUS }
 
-	| '!' | "¬" | '~' | "not" | "Not"     { UNARY_NEGATION }
+	| '!' | "¬" | '~' | "math.not" | "Math.Not"     { UNARY_NEGATION }
 
-	| '^' | "pow" | "Pow"                 { BINARY_POWER }
-	| '*'                                 { BINARY_MULTIPLY }
-	| '/'                                 { BINARY_DIVIDE }
-	| '%' | "mod" | "Mod"                 { BINARY_MODULO }
+	| '^' | "math.pow" | "Math.Pow"                 { BINARY_POWER }
+	| '*' | "math.mul" | "Math.Mul"         { BINARY_MULTIPLY }
+	| '/' | "math.div" | "Math.Div"         { BINARY_DIVIDE }
+	| '%' | "math.mod" | "Math.Mod"                 { BINARY_MODULO }
 
-	| "<<"                                { BITWISE_LEFT }
-	| ">>"                                { BITWISE_RIGHT }
+	| "<<" | "math.left" | "Math.Left"      { BITWISE_LEFT }
+	| ">>" | "math.right" | "Math.Right"   { BITWISE_RIGHT }
 
 	| '<'                                 { COMPARE_LT }
 	| "≤" | "<="                          { COMPARE_LTE }
@@ -93,9 +103,9 @@ rule lexer = parse
 	| "=="                                { COMPARE_E }
 	| "≠" | "!="                          { COMPARE_NE }
 
-	| '&' | "∧" | "and" | "And"           { BITWISE_AND }
-	| '^' | "⊻" | "xor" | "XOr"           { BITWISE_XOR }
-	| '|' | "∨" | "⊕"  | "or" | "Or"      { BITWISE_OR }
+	| '&' | "∧" | "math.and" | "Math.And"           { BITWISE_AND }
+	| '^' | "⊻" | "math.xor" | "Math.XOr"           { BITWISE_XOR }
+	| '|' | "∨" | "⊕"  | "math.or" | "Math.Or"      { BITWISE_OR }
 
 	| "+="                                { ASSIGN_ADDITION }
 	| "-="                                { ASSIGN_SUBTRACT }
@@ -106,6 +116,15 @@ rule lexer = parse
 	| "^="                                { ASSIGN_XOR }
 	| "|="                                { ASSIGN_OR }
 	| '='                                 { ASSIGN_EQUAL }
+
+	| "math.min" | "Math.Min"                       { MATH_MIN }
+	| "math.max" | "Math.Max"                       { MATH_MAX }
+	| "math.abs" | "Math.Abs"                       { MATH_ABS }
+	| "math.sign" | "Math.Sign"                     { MATH_SIGN }
+	| "math.sqrt" | "Math.Sqrt"                     { MATH_SQRT }
+	| "math.ln" | "Math.Ln"                         { MATH_LN }
+	| "math.log" | "Math.Log"                       { MATH_LOG }
+	| "math.fact" | "Math.Fact"                     { MATH_FACT }
 
 	(* Need to be after keywords *)
 	| ['a'-'z''A'-'Z']['a'-'z''A'-'Z''0'-'9''-''_']* as v { IDENT v }
@@ -136,11 +155,9 @@ and read_string buf = parse
 	| eof                                 { raise (SyntaxError ("String is not terminated!")) }
 
 and read_block_comment buf = parse
-	| '*'[' ''\t''\n''\r']*'/'            { Buffer.contents buf }
-	| eof                                 { Buffer.contents buf }
+	| '*'[' ''\t''\n''\r']*'/' | eof      { Buffer.contents buf }
 	| _                                   { Buffer.add_string buf (Lexing.lexeme lexbuf); read_block_comment buf lexbuf}
 
 and read_line_comment buf = parse
 	| [^'\n''\r']*                        { Buffer.add_string buf (Lexing.lexeme lexbuf); read_line_comment buf lexbuf }
-	| ['\n''\r']                          { Buffer.contents buf }
-	| eof                                 { Buffer.contents buf }
+	| ['\n''\r'] | eof                    { Buffer.contents buf }
