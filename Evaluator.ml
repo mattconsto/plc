@@ -16,6 +16,8 @@ let rec result_to_int res = match res with
 	| TermPair(a, b) -> (match b with
 		| TermUnit -> (result_to_int a)
 		| _      -> (result_to_int a) ^ " " ^ (result_to_int b))
+	| TermLambda(x, old, t, a) -> Printf.sprintf "lambda (%s)" x
+	| TermList l -> (let rec printlist l s = match l with (h :: t) -> printlist t (s ^ " " ^ (result_to_int h)) | [] -> s in printlist l "")
 	| TermLambda(x, env, t, a) -> Printf.sprintf "lambda (%s)" x
 	| a -> raise (NonBaseTypeResult a)
 
@@ -176,6 +178,15 @@ let rec eval output error input env e = flush_all (); match e with
 		| _ -> raise (StuckTerm "Apply"))
 
 	| TermLambda(x, old, t, a) -> TermLambda(x, env, t, a)
+
+	| TermMap (f,d) -> (let rec map func data result =
+												(match data with
+													| TermPair (head,tail) -> let apply = (TermApply (func, head)) in
+																										let r = (eval output error input env apply) in
+																										map func tail (r :: result)
+													| TermUnit			-> TermList result
+													| _ 						-> raise (StuckTerm "Map")) in
+											map (eval output error input env f) (eval output error input env d) [])
 
 	| TermUnit -> TermUnit
 	| _ -> raise (StuckTerm "Unknown")

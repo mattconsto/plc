@@ -69,6 +69,13 @@ type aquaTerm =
 	| TermLambda of string * aquaTerm environment * aquaType * aquaTerm
 	| TermApply of aquaTerm * aquaTerm
 
+	| TermMap of aquaTerm * aquaTerm
+	| TermFold of aquaTerm * aquaTerm
+	| TermFilter of aquaTerm * aquaTerm
+	| TermLimit of aquaTerm * aquaTerm
+
+
+
 let global_types  = (extend Head:aquaType environment)
 let global_values = (extend Head:aquaTerm environment)
 

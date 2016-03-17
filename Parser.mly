@@ -19,6 +19,7 @@
 %token IN IF THEN ELSE FUN MATCH WHILE DONE DO DONE FOR BREAK CONTINUE RETURN ASSERT EXIT CONS HEAD TAIL PRINT_INT PRINT_STRING PRINT_BOOL PRINTLN_INT PRINTLN_STRING PRINTLN_BOOL READ_INT READ_STRING READ_BOOL RANDOM LENGTH
 
 %token LAMBDA ROUNDL ROUNDR UTYPE ITYPE LTYPE PTYPE FUNTYPE
+%token MAP FOLD FILTER LIMIT
 
 /* Brackets */
 %token CURLYL CURLYR ROUNDL ROUNDR SQUAREL SQUARER
@@ -99,6 +100,11 @@ expr:
 	| expr ROUNDL expr ROUNDR                          { TermApply ($1, $3) }
 	| ROUNDL expr ROUNDR                               { $2 }
 	| CURLYL exprs CURLYR                              { TermScope $2 }
+
+	| MAP expr expr																		 { TermMap ($2, $3) }
+	| FILTER expr expr																 { TermFilter ($2, $3) }
+	| FOLD expr expr																	 { TermFold ($2, $3) }
+	| LIMIT expr expr																 	 { TermLimit ($2, $3) }
 
 	| list                                             { $1 }
 	| data                                             { $1 }
