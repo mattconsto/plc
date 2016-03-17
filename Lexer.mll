@@ -1,7 +1,11 @@
 {
 	open Parser
+	open Lexing
 
 	exception SyntaxError of string
+
+	let error msg start finish = Printf.sprintf "(line %d: char %d..%d): %s" start.Lexing.pos_lnum (start.pos_cnum -start.pos_bol) (finish.pos_cnum - finish.pos_bol) msg
+	let lex_error lexbuf = raise ( SyntaxError (error (lexeme lexbuf) (lexeme_start_p lexbuf) (lexeme_end_p lexbuf)))
 }
 rule lexer = parse
 	(* whitespace *)
@@ -143,6 +147,9 @@ rule lexer = parse
 	| ','                                                                         { COMMA }
 	| ';'                                                                         { SEMI_COLON }
 	| eof                                                                         { EOF }
+
+	(* catch all pattern *)
+	| _                      { lex_error lexbuf }
 
 and read_string buf = parse
 	| '"'                                                                         { Buffer.contents buf }

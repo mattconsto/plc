@@ -1,3 +1,6 @@
+open Lexer
+open Parser
+
 open Types
 open Environment
 open Checker
@@ -18,6 +21,7 @@ let run co ce ci str = try
     eval co ce ci ele)
 with
   | EnvironmentReachedHead m -> Printf.fprintf ce "Environment Error: Reached the top of the environment%s\n" m; TermUnit
+  | SyntaxError m            -> Printf.fprintf ce "Syntax Error: %s\n" m; TermUnit
   | ParseError m             -> Printf.fprintf ce "Parse Error: Failed to parse %s\n" m; TermUnit
   | TypeError m              -> Printf.fprintf ce "Type Error: %s\n" m; TermUnit
 
