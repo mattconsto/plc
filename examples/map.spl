@@ -1,3 +1,1 @@
-int -> int addOne = lambda (int x) { x + 1 };
-int red = read_int;
-addOne (red);
+map (lambda (int x) { x + 1; }) [1,2,3]
