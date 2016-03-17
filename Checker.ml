@@ -99,3 +99,8 @@ let rec typeOf env e = flush_all(); match e with
 														| (TermLambda(x,old,t,e), TypePair(h,r), TypeNum) -> TypeList h
 														| (TermLambda(x,old,t,e), TypeUnit, TypeNum) -> TypeUnit
 														| (_,_,_) 																					-> raise (TypeError "Fold"))
+
+	| TermLimit (l,n) -> (match (typeOf env l, typeOf env n) with
+													| (TypePair(h,r),TypeNum) -> TypeList h
+													| (TypeUnit,_) -> TypeUnit
+													| (_,_) -> raise (TypeError "Limit"))
