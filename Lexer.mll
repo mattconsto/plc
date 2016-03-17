@@ -21,10 +21,10 @@ rule lexer = parse
 	| "->"   | "→" | "to" | "To"                                                  { FUNTYPE }
 	| "\\l"  | "lambda" | "Lambda" | "function" | "Function"                      { LAMBDA }
 
-	| "list.map"    | "List.Map"                                                  { MAP }
-	| "list.fold"   | "List.Fold"                                                 { FOLD }
-	| "list.filter" | "List.Filter"                                               { FILTER }
-	| "list.limit"  | "List.Limit"                                                { LIMIT }
+	| "list.map"    | "List.Map"                                                 	{ MAP }
+	| "list.fold"   | "List.Fold"                                          				{ FOLD }
+	| "list.filter" | "List.Filter"                                          			{ FILTER }
+	| "list.limit"  | "List.Limit"	                                              { LIMIT }
 	| "list.length" | "List.Length" | "#"                                         { LENGTH }
 
 	| "unbind"    | "Unbind"                                                      { UNBIND }

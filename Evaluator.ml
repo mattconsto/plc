@@ -209,7 +209,7 @@ let rec eval co ce ci env e = flush_all (); match e with
 													| TermPair (head,tail) -> let apply = (TermApply (func, head)) in
 																										let r = (eval co ce ci env apply) in
 																										map func tail (r :: result)
-													| TermUnit			-> TermList result
+													| TermUnit			-> TermList (List.rev result)
 													| _ 						-> raise (StuckTerm "Map")) in
 											map (eval co ce ci env f) (eval co ce ci env d) [])
 	 | TermFilter (f,d) -> (let rec filter func data result =
@@ -219,7 +219,7 @@ let rec eval co ce ci env e = flush_all (); match e with
 																												(match r with
 																													| TermNum 0 							 -> filter func tail result
 																													| _ 											 -> filter func tail (head :: result))
-															| TermUnit -> TermList result
+															| TermUnit -> TermList (List.rev result)
 															| _ -> raise (StuckTerm "Filter") in
 													filter (eval co ce ci env f) (eval co ce ci env d) [])
 	| TermFold (f,d,n) -> (let rec fold func data result =
