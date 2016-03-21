@@ -1,0 +1,1 @@
+console.println_int list.filter (lambda (int x) { x }) [1,2,3,0]

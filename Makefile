@@ -13,13 +13,12 @@
 #  make full    runs clean, depend and all in order
 
 # These are the object files needed to rebuild the mysplinterpreter executable file
-#
-OBJS = Environment.cmo Types.cmo Checker.cmo Evaluator.cmo Parser.cmo Lexer.cmo Language.cmo mysplinterpreter.cmo
 
-COMMONOBJS = str.cma
+OBJS   = Environment.cmo Types.cmo Checker.cmo Evaluator.cmo Parser.cmo Lexer.cmo Language.cmo mysplinterpreter.cmo
+COMMON = str.cma
+DEPEND = Lexer.ml Parser.ml# Files that need to be generated from other files
 
-# Files that need to be generated from other files
-DEPEND += Lexer.ml Parser.ml
+OCAMLC = ocamlc -w +a-3-4-6-7-9-27-29-32..39-41..42-44-45# Disable deprecation warning
 
 # Fix Makefile on Windows, not sure how it works
 ifeq ($(OS), Windows_NT)
@@ -36,15 +35,15 @@ include .depend
 # Build an executable typechecker
 mysplinterpreter: $(OBJS) mysplinterpreter.cmo
 	@echo Linking $@
-	ocamlc -o $@ $(COMMONOBJS) $(OBJS)
+	$(OCAMLC) -o $@ $(COMMON) $(OBJS)
 
 # Compile an ML module interface
 %.cmi : %.mli
-	ocamlc -c $<
+	$(OCAMLC) -c $<
 
 # Compile an ML module implementation
 %.cmo : %.ml
-	ocamlc -c $<
+	$(OCAMLC) -c $<
 
 # Generate ML files from a Parser definition file
 Parser.ml Parser.mli: Parser.mly
