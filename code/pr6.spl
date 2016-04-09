@@ -1,0 +1,11 @@
+/*
+  Problem 6: Copying + Prefix
+*/
+
+int last = 0;
+
+loop {
+  int current = console.read_int;
+  console.println_int [current, last];
+  last = current;
+}

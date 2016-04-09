@@ -20,11 +20,6 @@ DEPEND = Lexer.ml Parser.ml# Files that need to be generated from other files
 
 OCAMLC = ocamlc -w +a-3-4-6-7-9-27-29-32..39-41..42-44-45# Disable deprecation warning
 
-# Fix Makefile on Windows, not sure how it works
-ifeq ($(OS), Windows_NT)
-	SHELL=cmd
-endif
-
 # When "make" is invoked with no arguments, we build an executable
 # typechecker, after building everything that it depends on
 all: $(DEPEND) $(OBJS) mysplinterpreter

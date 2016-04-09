@@ -1,0 +1,8 @@
+/*
+  Problem 7: Copying + Stream Arithmetic
+*/
+
+loop {
+  int temp = console.read_int;
+  console.println_int [temp - console.read_int, temp];
+}

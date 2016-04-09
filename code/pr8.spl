@@ -1,0 +1,12 @@
+/*
+  Problem 8: Copying + Prefix + Stream Arithmetic
+*/
+
+int a = 0;
+int b = 0;
+
+loop {
+  a = console.read_int;
+  console.println_int a + b;
+  b = a;
+}
