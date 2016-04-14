@@ -1,0 +1,9 @@
+/*
+  Problem 7: Copying + Stream Arithmetic
+  - Take 2 sequences and output 2 sequences: an - bn and an
+
+loop {
+  int a = console.read_int;
+  int b = console.read_int;
+  console.println_int [a - b, a]
+}

@@ -1,0 +1,12 @@
+/*
+  Problem 6: Copying + prefix
+  - Output 2 copies, second prefixed with a 0
+*/
+
+int last = 0;
+
+loop {
+  int current = console.read_int;
+  console.println_int [current, last];
+  last = current;
+}
