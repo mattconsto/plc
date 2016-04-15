@@ -4,10 +4,10 @@
 
 int odd   = 0;
 int even  = 0;
-int count = 0;
+int step = 0;
 
 loop {
-  if (count += 1) % 2 == 0 then {
+  if (step = (step + 1) % 2) == 0 then {
     console.println_int odd  += console.read_int;
   } else {
     console.println_int even += console.read_int;

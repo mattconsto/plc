@@ -1,8 +1,11 @@
 /*
   Problem 7: Copying + Stream Arithmetic
+
+  Takes 2 sequences and outputs 2 sequences
 */
 
 loop {
-  int temp = console.read_int;
-  console.println_int [temp - console.read_int, temp];
+  int a = console.read_int;
+  int b = console.read_int;
+  console.println_int [a - b, a]
 }
