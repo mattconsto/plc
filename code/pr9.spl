@@ -1,10 +1,8 @@
 /*
   Problem 9: Natural Numbers
 
-  Ok, this one is a little complex. Lets say you have an input consisting of
-  five values: a, b, c, d, e. Each time the loop executes the value read is
-  added to values, then values is added to total. So in theory at least it
-  works.
+  Lets say you have an input of five values: a, b, c, d, e. Each time the loop
+  executes the value read is added to values, then values is added to total.
 
   values  total            ordered
   a       a                a
@@ -12,7 +10,6 @@
   abc     aababc           aaabbc
   abcd    aababcabcd       aaaabbbccd
   abcde   aababcabcdabcde  aaaaabbbbcccdde
-
  */
 
 int values = 0;

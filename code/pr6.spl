@@ -1,7 +1,7 @@
 /*
   Problem 6: Copying + Prefix
 
-  Outputs 2 copies, the second prefixed with a 0
+  Outputs 2 copies, the second prefixed with a 0.
 */
 
 int last = 0;

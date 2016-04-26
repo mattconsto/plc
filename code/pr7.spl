@@ -1,7 +1,7 @@
 /*
   Problem 7: Copying + Stream Arithmetic
 
-  Takes 2 sequences and outputs 2 sequences
+  Takes 2 sequences (a, b) and outputs 2 sequences (a - b, a).
 */
 
 loop {
