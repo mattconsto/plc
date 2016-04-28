@@ -6,10 +6,11 @@
 
 int odd  = 0;
 int even = 0;
-int step = 0;
+int step = false;
 
 loop {
-  if (step = (step + 1) % 2) == 0 then
+  // Toggle between the two states each line, starts with odd.
+  if step = !step then
     console.println_int odd  += console.read_int
   else
     console.println_int even += console.read_int
