@@ -85,7 +85,7 @@ let rec typeOf env e = flush_all(); match e with
 	| TermApply (a, b) -> (	match typeOf env a with
 		| TypeFun (tT, tU) -> (
  			match tT = typeOf env b with
-				| true -> tT
+				| true -> tU
 				| false -> raise (TypeError "Function has a different type than expected")
 				)
 		| _ -> raise (TypeError (Printf.sprintf "While binding got %s which is not a function" (type_to_string (typeOf env a)))))

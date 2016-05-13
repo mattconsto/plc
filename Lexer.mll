@@ -23,7 +23,7 @@ rule lexer = parse
 	| "list" | "List"                                                             { LTYPE }
 	| "pair" | "Pair"                                                             { PTYPE }
 	| "->"   | "→" | "to" | "To"                                                  { FUNTYPE }
-	| "\\l"  | "lambda" | "Lambda" | "function" | "Function"                      { LAMBDA }
+	| "\\l"  | "λ" | "lambda" | "Lambda" | "function" | "Function"                { LAMBDA }
 
 	| "list.map"    | "List.Map"                                                 	{ MAP }
 	| "list.fold"   | "List.Fold"                                          				{ FOLD }
@@ -31,12 +31,13 @@ rule lexer = parse
 	| "list.limit"  | "List.Limit"	                                              { LIMIT }
 	| "list.length" | "List.Length" | "#"                                         { LENGTH }
 
+	| "list.rev"    | "List.Rev"                                                  { STRING_REV }
+
 	| "unbind"    | "Unbind"                                                      { UNBIND }
 	| "in"        | "In"                                                          { IN }
 	| "if"        | "If"                                                          { IF }
 	| "then"      | "Then"                                                        { THEN }
 	| "else"      | "Else"                                                        { ELSE }
-	| "fun"       | "Fun"                                                         { FUN }
 	| "match"     | "Match"                                                       { MATCH }
 	| "while"     | "While"                                                       { WHILE }
 	| "done"      | "Done"                                                        { DONE }
@@ -57,26 +58,42 @@ rule lexer = parse
 	| "string.upper"           | "String.Upper"                                   { STRING_UPPER }
 	| "string.rev"             | "String.Rev"                                     { STRING_REV }
 
+	| "io.readi"               | "IO.ReadI"
 	| "console.read_int"       | "Console.Read_Int"                               { READ_INT }
+	| "io.reads"               | "IO.ReadS"
 	| "console.read_string"    | "Console.Read_String"                            { READ_STRING }
+	| "io.readb"               | "IO.ReadB"
 	| "console.read_bool"      | "Console.Read_Bool"                              { READ_BOOL }
 
+	| "io.clear"               | "IO.Clear"
 	| "console.clear"          | "Console.Clear"                                  { CLEAR }
 
+	| "io.printi"              | "IO.PrintI"
 	| "console.print_int"      | "Console.Print_Int"                              { PRINT_INT }
+	| "io.prints"              | "IO.PrintS"
 	| "console.print_string"   | "Console.Print_String"                           { PRINT_STRING }
+	| "io.printb"              | "IO.PrintB"
 	| "console.print_bool"     | "Console.Print_Bool"                             { PRINT_BOOL }
 
+	| "io.printlni"            | "IO.PrintlnI"
 	| "console.println_int"    | "Console.Println_Int"                            { PRINTLN_INT }
+	| "io.printlns"            | "IO.PrintlnS"
 	| "console.println_string" | "Console.Println_String"                         { PRINTLN_STRING }
+	| "io.printlnb"            | "IO.PrintlnB"
 	| "console.println_bool"   | "Console.Println_Bool"                           { PRINTLN_BOOL }
 
+	| "io.errori"              | "IO.ErrorI"
 	| "console.error_int"      | "Console.Error_Int"                              { ERROR_INT }
+	| "io.errors"              | "IO.ErrorS"
 	| "console.error_string"   | "Console.Error_String"                           { ERROR_STRING }
+	| "io.errorb"              | "IO.ErrorB"
 	| "console.error_bool"     | "Console.Error_Bool"                             { ERROR_BOOL }
 
+	| "io.errorlni"            | "IO.ErrorlnI"
 	| "console.errorln_int"    | "Console.Errorln_Int"                            { ERRORLN_INT }
+	| "io.errorlns"            | "IO.ErrorlnS"
 	| "console.errorln_string" | "Console.Errorln_String"                         { ERRORLN_STRING }
+	| "io.errorlnb"            | "IO.ErrorlnB"
 	| "console.errorln_bool"   | "Console.Errorln_Bool"                           { ERRORLN_BOOL }
 
 	(* Brackets *)
@@ -103,6 +120,7 @@ rule lexer = parse
 	| "<<" | "math.left"  | "Math.Left"                                           { BITWISE_LEFT }
 	| ">>" | "math.right" | "Math.Right"                                          { BITWISE_RIGHT }
 
+	| "math.rand"   | "Math.Rand"
 	| "math.random" | "Math.Random"                                               { RANDOM }
 	| "math.min"    | "Math.Min"                                                  { MATH_MIN }
 	| "math.max"    | "Math.Max"                                                  { MATH_MAX }
