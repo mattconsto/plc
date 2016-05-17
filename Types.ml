@@ -134,9 +134,9 @@ let rec term_to_string aquaTerm = match aquaTerm with
 	| TermPlus           (a, b) -> sprintf "%s + %s" (term_to_string a) (term_to_string b)
 	| TermSubtract       (a, b) -> sprintf "%s - %s" (term_to_string a) (term_to_string b)
 
-	| TermStringLower         s -> sprintf "strinng.lower %s" (term_to_string s)
-	| TermStringUpper         s -> sprintf "strinng.upper %s" (term_to_string s)
-	| TermStringRev           s -> sprintf "strinng.rev %s" (term_to_string s)
+	| TermStringLower         s -> sprintf "string.lower %s" (term_to_string s)
+	| TermStringUpper         s -> sprintf "string.upper %s" (term_to_string s)
+	| TermStringRev           s -> sprintf "string.rev %s" (term_to_string s)
 
 	| TermMathMin        (a, b) -> sprintf "math.min %s %s" (term_to_string a) (term_to_string b)
 	| TermMathMax        (a, b) -> sprintf "math.max %s %s" (term_to_string a) (term_to_string b)
