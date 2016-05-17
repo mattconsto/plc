@@ -71,6 +71,7 @@ type_spec:
 	| PTYPE COMPARE_LT type_spec COMMA type_spec COMPARE_GT { TypePair ($3, $5) }
 	| LTYPE COMPARE_LT type_spec COMPARE_GT            { TypeList $3 }
 	| type_spec FUNTYPE type_spec                      { TypeFun ($1, $3) }
+	| type_spec COMPARE_GT type_spec                   { TypeFun ($1, $3) }
 	| ROUNDL type_spec ROUNDR                          { $2 }
 
 exprs:
@@ -100,7 +101,11 @@ expr:
 
 	| UNBIND IDENT                                     { TermUnBind $2 }
 	| LAMBDA ROUNDL type_spec IDENT ROUNDR expr        { TermLambda ($4, global_values, $3, $6) }
+	| LAMBDA ROUNDL ROUNDR expr                        { TermLambda ("__LAMBDA_UNIT_ARG__", global_values, TypeUnit, $4) }
+	| expr ROUNDL ROUNDR                               { TermApply ($1, TermUnit) }
 	| expr ROUNDL expr ROUNDR                          { TermApply ($1, $3) }
+	| expr ROUNDL expr COMMA expr ROUNDR               { TermApply ( TermApply ($1, $3), $5) }
+	| expr ROUNDL expr COMMA expr COMMA expr ROUNDR    { TermApply ( TermApply ( TermApply ($1, $3), $5), $7) } /* Cheeky */
 	| ROUNDL expr ROUNDR                               { $2 }
 	| CURLYL exprs CURLYR                              { TermScope $2 }
 

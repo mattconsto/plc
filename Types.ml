@@ -1,4 +1,5 @@
 open Environment
+open Printf
 
 type aquaType = TypeUnit | TypeNum | TypePair of aquaType * aquaType | TypeList of aquaType | TypeFun of aquaType * aquaType
 
@@ -98,98 +99,115 @@ let global_types  = (extend Head:aquaType environment)
 let global_values = (extend Head:aquaTerm environment)
 
 let rec type_to_string aquaType = match aquaType with
-	| TypeUnit        -> "Unit"
-	| TypeNum         -> "Number"
-	| TypePair (a, b) -> Printf.sprintf "Pair<%s, %s>" (type_to_string a) (type_to_string b)
-	| TypeList a      -> Printf.sprintf "List<%s>" (type_to_string a)
-	| TypeFun (a, b)  -> Printf.sprintf "Lambda<%s, %s>" (type_to_string a) (type_to_string b)
+	| TypeUnit                  -> "unit"
+	| TypeNum                   -> "int"
+	| TypePair           (a, b) -> sprintf "pair<%s, %s>" (type_to_string a) (type_to_string b)
+	| TypeList                a -> sprintf "list<%s>" (type_to_string a)
+	| TypeFun            (a, b) -> sprintf "%s → %s" (type_to_string a) (type_to_string b)
 
-let term_to_string aquaTerm = match aquaTerm with
-	| TermUnit -> "TermUnit"
-	| TermNum _ -> "TermNum"
-	| TermPair _ -> "TermPair"
-	| TermList _ -> "TermList"
-	| TermString _ -> "TermString"
+let rec term_to_string aquaTerm = match aquaTerm with
+	| TermUnit                  -> "[]"
+	| TermNum                 n -> sprintf "%d" n
+	| TermPair           (a, b) -> let rec builder a b = (match a, b with
+			| m, TermPair (n, o) -> sprintf "%s,%s" (term_to_string m) (builder n o)
+			| m, TermUnit        -> (term_to_string m)
+			| m, n               -> sprintf "%s.%s" (term_to_string m) (term_to_string n)
+		) in sprintf "[%s]" (builder a b)
+	| TermList                _ -> "TODO LIST"
+	| TermString              s -> s
 
-	| TermLessThan _ -> "TermLessThan"
-	| TermLessThanEqual _ -> "TermLessThanEqual"
-	| TermMoreThan _ -> "TermMoreThan"
-	| TermMoreThanEqual _ -> "TermMoreThanEqual"
-	| TermEqual _ -> "TermEqual"
-	| TermNotEqual _ -> "TermNotEqual"
+	| TermLessThan       (a, b) -> sprintf "%s < %s" (term_to_string a) (term_to_string b)
+	| TermLessThanEqual  (a, b) -> sprintf "%s ≤ %s" (term_to_string a) (term_to_string b)
+	| TermMoreThan       (a, b) -> sprintf "%s > %s" (term_to_string a) (term_to_string b)
+	| TermMoreThanEqual  (a, b) -> sprintf "%s ≥ %s" (term_to_string a) (term_to_string b)
+	| TermEqual          (a, b) -> sprintf "%s = %s" (term_to_string a) (term_to_string b)
+	| TermNotEqual       (a, b) -> sprintf "%s ≠ %s" (term_to_string a) (term_to_string b)
 
-	| TermUnaryNot _ -> "TermUnaryNot"
-	| TermUnaryMinus _ -> "TermUnaryMinus"
-	| TermUnaryPlus _ -> "TermUnaryPlus"
+	| TermUnaryNot            a -> sprintf "¬%s" (term_to_string a)
+	| TermUnaryMinus          a -> sprintf "-%s" (term_to_string a)
+	| TermUnaryPlus           a -> sprintf "+%s" (term_to_string a)
 
-	| TermPower _ -> "TermPower"
-	| TermMultiply _ -> "TermMultiply"
-	| TermDivide _ -> "TermDivide"
-	| TermModulo _ -> "TermModulo"
-	| TermPlus _ -> "TermPlus"
-	| TermSubtract _ -> "TermSubtract"
+	| TermPower          (a, b) -> sprintf "%s ^ %s" (term_to_string a) (term_to_string b)
+	| TermMultiply       (a, b) -> sprintf "%s * %s" (term_to_string a) (term_to_string b)
+	| TermDivide         (a, b) -> sprintf "%s / %s" (term_to_string a) (term_to_string b)
+	| TermModulo         (a, b) -> sprintf "%s %% %s" (term_to_string a) (term_to_string b)
+	| TermPlus           (a, b) -> sprintf "%s + %s" (term_to_string a) (term_to_string b)
+	| TermSubtract       (a, b) -> sprintf "%s - %s" (term_to_string a) (term_to_string b)
 
-	| TermStringLower _ -> "TermStringLower"
-	| TermStringUpper _ -> "TermStringUpper"
-	| TermStringRev _ -> "TermStringRev"
+	| TermStringLower         s -> sprintf "strinng.lower %s" (term_to_string s)
+	| TermStringUpper         s -> sprintf "strinng.upper %s" (term_to_string s)
+	| TermStringRev           s -> sprintf "strinng.rev %s" (term_to_string s)
 
-	| TermMathMin _ -> "TermMathMin"
-	| TermMathMax _ -> "TermMathMax"
-	| TermMathAbs _ -> "TermMathAbs"
-	| TermMathSign _ -> "TermMathSign"
-	| TermMathSqrt _ -> "TermMathSqrt"
-	| TermMathLog _ -> "TermMathLog"
-	| TermMathLn _ -> "TermMathLn"
-	| TermMathFact _ -> "TermMathFact"
+	| TermMathMin        (a, b) -> sprintf "math.min %s %s" (term_to_string a) (term_to_string b)
+	| TermMathMax        (a, b) -> sprintf "math.max %s %s" (term_to_string a) (term_to_string b)
+	| TermMathAbs             a -> sprintf "math.abs %s" (term_to_string a)
+	| TermMathSign            a -> sprintf "math.sign %s" (term_to_string a)
+	| TermMathSqrt            a -> sprintf "math.sqrt %s" (term_to_string a)
+	| TermMathLog             a -> sprintf "math.log %s" (term_to_string a)
+	| TermMathLn              a -> sprintf "math.ln %s" (term_to_string a)
+	| TermMathFact            a -> sprintf "math.fact %s" (term_to_string a)
 
-	| TermShiftLeft _ -> "TermShiftLeft"
-	| TermShiftRight _ -> "TermShiftRight"
-	| TermBitwiseAnd _ -> "TermBitwiseAnd"
-	| TermBitwiseXOr _ -> "TermBitwiseXOr"
-	| TermBitwiseOr _ -> "TermBitwiseOr"
+	| TermShiftLeft      (a, b) -> sprintf "%s << %s" (term_to_string a) (term_to_string b)
+	| TermShiftRight     (a, b) -> sprintf "%s >> %s" (term_to_string a) (term_to_string b)
+	| TermBitwiseAnd     (a, b) -> sprintf "%s ∧ %s" (term_to_string a) (term_to_string b)
+	| TermBitwiseXOr     (a, b) -> sprintf "%s ⊻ %s" (term_to_string a) (term_to_string b)
+	| TermBitwiseOr      (a, b) -> sprintf "%s ∨ %s" (term_to_string a) (term_to_string b)
 
-	| TermScope _ -> "TermScope"
-	| TermWhile _ -> "TermWhile"
-	| TermDo _ -> "TermDo"
-	| TermFor _ -> "TermFor"
+	| TermScope               a -> sprintf "{%s}" (term_to_string a)
+	| TermWhile          (p, a) -> sprintf "while %s do %s" (term_to_string p) (term_to_string a)
+	| TermDo             (p, a) -> sprintf "do %s while %s" (term_to_string a) (term_to_string p)
+	| TermFor      (a, b, c, d) -> sprintf "for %s; %s; %s then %s" (term_to_string a) (term_to_string b) (term_to_string c) (term_to_string d)
 
-	| TermBreak -> "TermBreak"
-	| TermContinue -> "TermContinue"
-	| TermReturn _ -> "TermReturn"
-	| TermAssert _ -> "TermAssert"
-	| TermExit _ -> "TermExit"
+	| TermBreak                 -> "break"
+	| TermContinue              -> "continue"
+	| TermReturn              a -> sprintf "return %s" (term_to_string a)
+	| TermAssert              a -> sprintf "assert %s" (term_to_string a)
+	| TermExit                a -> sprintf "exit %s" (term_to_string a)
 
-	| TermReadInt -> "TermReadInt"
-	| TermReadString -> "TermReadString"
-	| TermReadBool -> "TermReadBool"
+	| TermReadInt               -> "io.readi"
+	| TermReadString            -> "io.reads"
+	| TermReadBool              -> "io.readb"
 
-	| TermClear -> "TermClear"
+	| TermClear                 -> "io.clear"
 
-	| TermPrintInt _ -> "TermPrintInt"
-	| TermPrintString _ -> "TermPrintString"
-	| TermPrintBool _ -> "TermPrintBool"
+	| TermPrintInt            a -> sprintf "io.printi %s" (term_to_string a)
+	| TermPrintString         a -> sprintf "io.prints %s" (term_to_string a)
+	| TermPrintBool           a -> sprintf "io.printb %s" (term_to_string a)
 
-	| TermErrorInt _ -> "TermErrorInt"
-	| TermErrorString _ -> "TermErrorString"
-	| TermErrorBool _ -> "TermErrorBool"
+	| TermErrorInt            a -> sprintf "io.errori %s" (term_to_string a)
+	| TermErrorString         a -> sprintf "io.errors %s" (term_to_string a)
+	| TermErrorBool           a -> sprintf "io.errorb %s" (term_to_string a)
 
-	| TermRandom _ -> "TermRandom"
+	| TermRandom         (a, b) -> sprintf "math.rand %s %s" (term_to_string a) (term_to_string b)
 
-	| TermCons _ -> "TermCons"
-	| TermConsFirst _ -> "TermConsFirst"
-	| TermConsLast _ -> "TermConsLast"
-	| TermHead _ -> "TermHead"
-	| TermTail _ -> "TermTail"
-	| TermLength _ -> "TermLength"
-	| TermMap _ -> "TermMap"
-	| TermFold _ -> "TermFold"
-	| TermFilter _ -> "TermFilter"
-	| TermLimit _ -> "TermLimit"
+	| TermCons           (a, b) -> let rec builder a b = (match a, b with
+			| m, TermCons (n, o) -> sprintf "%s,%s" (term_to_string m) (builder n o)
+			| m, TermUnit        -> (term_to_string m)
+			| m, n               -> sprintf "%s.%s" (term_to_string m) (term_to_string n)
+		) in sprintf "[%s]" (builder a b)
+	| TermConsFirst      (a, b) -> let rec builder a b = (match a, b with
+			| m, TermConsFirst (n, o) -> sprintf "%s,%s" (term_to_string m) (builder n o)
+			| m, TermUnit             -> (term_to_string m)
+			| m, n                    -> sprintf "%s.%s" (term_to_string m) (term_to_string n)
+		) in sprintf "|%s]" (builder a b)
+	| TermConsLast       (a, b) -> let rec builder a b = (match a, b with
+			| m, TermConsLast (n, o) -> sprintf "%s,%s" (term_to_string m) (builder n o)
+			| m, TermUnit            -> (term_to_string m)
+			| m, n                   -> sprintf "%s.%s" (term_to_string m) (term_to_string n)
+		) in sprintf "[%s|" (builder a b)
+	| TermHead                a -> sprintf "head %s" (term_to_string a)
+	| TermTail                a -> sprintf "tail%s" (term_to_string a)
+	| TermLength              a -> sprintf "#%s" (term_to_string a)
+	| TermMap            (a, b) -> sprintf "list.map %s %s" (term_to_string a) (term_to_string b)
+	| TermFold        (a, b, c) -> sprintf "list.fold %s %s %s" (term_to_string a) (term_to_string b) (term_to_string c)
+	| TermFilter         (a, b) -> sprintf "list.filter %s %s" (term_to_string a) (term_to_string b)
+	| TermLimit          (a, b) -> sprintf "list.limit %s %s" (term_to_string a) (term_to_string b)
 
-	| TermVar _ -> "TermVar"
-	| TermIf _ -> "TermIf"
-	| TermBind _ -> "TermBind"
-	| TermReBind _ -> "TermReBind"
-	| TermUnBind _ -> "TermRUnBind"
-	| TermLambda _ -> "TermLambda"
-	| TermApply _ -> "TermApply"
+	| TermVar                a -> a
+	| TermIf         (p, a, b) -> sprintf "%s ? %s : %s" (term_to_string p) (term_to_string a) (term_to_string b)
+	| TermBind       (i, t, e) -> sprintf "%s %s = %s" (type_to_string t) i (term_to_string e)
+	| TermReBind        (i, e) -> sprintf "%s = %s" i (term_to_string e)
+	| TermUnBind             i -> sprintf "unbind %s" i
+	| TermLambda (i, v, TypeUnit, e) -> sprintf "λ() %s" (term_to_string e)
+	| TermLambda  (i, v, t, e) -> sprintf "λ(%s %s) %s" (type_to_string t) i (term_to_string e)
+	| TermApply         (a, b) -> sprintf "%s(%s)" (term_to_string a) (term_to_string b)

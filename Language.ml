@@ -36,3 +36,20 @@ with
 
   | Failure m                -> Printf.fprintf ce "Failure: %s\n" m; TermUnit
   | a                        -> Printf.fprintf ce "Unknown: %s\n" (Printexc.to_string a); TermUnit
+
+(* Print AST *)
+let ast co ce ci str = try
+  let ele = parse str in (
+    ignore (check ele);
+    Printf.sprintf "%s\n" (term_to_string ele))
+with
+  | EnvironmentReachedHead m -> Printf.fprintf ce "Environment Error: Reached the top of the environment%s\n" m; ""
+  | SyntaxError m            -> Printf.fprintf ce "Syntax Error: %s\n" m; ""
+  | ParseError m             -> Printf.fprintf ce "Parse Error: Failed to parse %s\n" m; ""
+  | TypeError m              -> Printf.fprintf ce "Type Error: %s\n" m; ""
+
+  | End_of_file              -> ""
+  | Terminated m             -> ""
+
+  | Failure m                -> Printf.fprintf ce "Failure: %s\n" m; ""
+  | a                        -> Printf.fprintf ce "Unknown: %s\n" (Printexc.to_string a); ""

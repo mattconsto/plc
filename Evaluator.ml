@@ -17,8 +17,7 @@ let rec result_to_int res = match res with
 		| TermUnit -> (result_to_int a)
 		| _      -> (result_to_int a) ^ " " ^ (result_to_int b))
 	| TermList l -> (let rec printlist l s = match l with (h :: t) -> printlist t (s ^ " " ^ (result_to_int h)) | [] -> s in printlist l "")
-  | TermLambda(x, env, t, a) -> Printf.sprintf "λ (%s) ..." x
-	| a -> raise (NonBaseTypeResult a)
+	| a -> term_to_string a
 
 let rec result_to_string res = match res with
 	| TermUnit        -> ""
@@ -26,8 +25,7 @@ let rec result_to_string res = match res with
 	| TermPair(a, b) -> (match b with
 		| TermUnit -> (result_to_string a)
 		| _      -> (result_to_string a) ^ (result_to_string b))
-	| TermLambda(x, env, t, a) -> Printf.sprintf "λ (%s) ..." x
-	| a -> raise (NonBaseTypeResult a)
+	| a -> term_to_string a
 
 let rec result_to_bool res = match res with
 	| TermUnit        -> "[]"
@@ -35,8 +33,7 @@ let rec result_to_bool res = match res with
 	| TermPair(a, b) -> (match b with
 		| TermUnit -> (result_to_bool a)
 		| _      -> (result_to_bool a) ^ " " ^ (result_to_bool b))
-	| TermLambda(x, env, t, a) -> Printf.sprintf "λ (%s) ..." x
-	| a -> raise (NonBaseTypeResult a)
+	| a -> term_to_string a
 
 let equality_test e = (match e with
 	| TermNum  0
