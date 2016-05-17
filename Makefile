@@ -14,7 +14,7 @@
 
 # These are the object files needed to rebuild the mysplinterpreter executable file
 
-OBJS   = Environment.cmo Types.cmo Checker.cmo Evaluator.cmo Parser.cmo Lexer.cmo Language.cmo mysplinterpreter.cmo
+OBJS   = Environment.cmo Types.cmo Stringify.cmo Checker.cmo Evaluator.cmo Parser.cmo Lexer.cmo Language.cmo mysplinterpreter.cmo
 COMMON = str.cma
 DEPEND = Lexer.ml Parser.ml# Files that need to be generated from other files
 

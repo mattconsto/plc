@@ -1,5 +1,6 @@
 open Types
 open Environment
+open Stringify
 
 exception Terminated of aquaTerm
 exception StuckTerm of string
@@ -10,37 +11,10 @@ exception LoopBreak
 exception LoopContinue
 exception Return of aquaTerm
 
-let rec result_to_int res = match res with
-	| TermUnit        -> "[]"
-	| TermNum i       -> Printf.sprintf "%i" i
-	| TermPair(a, b) -> (match b with
-		| TermUnit -> (result_to_int a)
-		| _      -> (result_to_int a) ^ " " ^ (result_to_int b))
-	| TermList l -> (let rec printlist l s = match l with (h :: t) -> printlist t (s ^ " " ^ (result_to_int h)) | [] -> s in printlist l "")
-	| a -> term_to_string a
-
-let rec result_to_string res = match res with
-	| TermUnit        -> ""
-	| TermNum i       -> String.make 1 (Char.chr i)
-	| TermPair(a, b) -> (match b with
-		| TermUnit -> (result_to_string a)
-		| _      -> (result_to_string a) ^ (result_to_string b))
-	| a -> term_to_string a
-
-let rec result_to_bool res = match res with
-	| TermUnit        -> "[]"
-	| TermNum i       -> if i != 0 then "true" else "false"
-	| TermPair(a, b) -> (match b with
-		| TermUnit -> (result_to_bool a)
-		| _      -> (result_to_bool a) ^ " " ^ (result_to_bool b))
-	| a -> term_to_string a
-
-let equality_test e = (match e with
-	| TermNum  0
+let equality_test = function
+	| TermNum 0
 	| TermUnit -> false
-	| TermPair(_, _)
-	| TermNum _ -> true
-	| _ -> raise (StuckTerm "If"))
+	| _        -> true
 
 (* Read lines, caching the numbers found *)
 let read_line_cache = ref [];;
@@ -72,13 +46,13 @@ let rec eval co ce ci env e = flush_all (); match e with
 
 	| TermClear                -> ignore (Sys.command "clear"); TermUnit
 
-	| TermPrintInt       a     -> Printf.fprintf co "%s" (result_to_int (eval co ce ci env a)); TermUnit
-	| TermPrintString    a     -> Printf.fprintf co "%s" (result_to_string (eval co ce ci env a)); TermUnit
-	| TermPrintBool      a     -> Printf.fprintf co "%s" (result_to_bool (eval co ce ci env a)); TermUnit
+	| TermPrintInt       a     -> Printf.fprintf co "%s" (term_to_stringf (eval co ce ci env a) IntegerFormatting); TermUnit
+	| TermPrintString    a     -> Printf.fprintf co "%s" (term_to_stringf (eval co ce ci env a) StringFormatting); TermUnit
+	| TermPrintBool      a     -> Printf.fprintf co "%s" (term_to_stringf (eval co ce ci env a) BooleanFormatting); TermUnit
 
-	| TermErrorInt       a     -> Printf.fprintf ce "%s" (result_to_int (eval co ce ci env a)); TermUnit
-	| TermErrorString    a     -> Printf.fprintf ce "%s" (result_to_string (eval co ce ci env a)); TermUnit
-	| TermErrorBool      a     -> Printf.fprintf ce "%s" (result_to_bool (eval co ce ci env a)); TermUnit
+	| TermErrorInt       a     -> Printf.fprintf ce "%s" (term_to_stringf (eval co ce ci env a) IntegerFormatting); TermUnit
+	| TermErrorString    a     -> Printf.fprintf ce "%s" (term_to_stringf (eval co ce ci env a) StringFormatting); TermUnit
+	| TermErrorBool      a     -> Printf.fprintf ce "%s" (term_to_stringf (eval co ce ci env a) BooleanFormatting); TermUnit
 
 	| TermRandom        (a, b) -> (match eval co ce ci env a, eval co ce ci env b with TermNum min, TermNum max -> TermNum (Random.int((max - min) + 1) + min)| _ -> raise (StuckTerm "Random"))
 

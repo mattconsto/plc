@@ -1,5 +1,6 @@
 open Types
 open Environment
+open Stringify
 
 exception TypeError of string;;
 
