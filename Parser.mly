@@ -133,9 +133,6 @@ list:
 	| DOUBLESQUAREL SQUARER                            { TermUnit }
 	| SQUAREL DOUBLESQUARER                            { TermUnit }
 	| SQUAREL SQUARER                                  { TermUnit }
-	| DOUBLESQUAREL expr DOT expr SQUARER              { TermConsFirst ($2, $4) }
-	| SQUAREL expr DOT expr DOUBLESQUARER              { TermConsLast ($2, $4) }
-	| SQUAREL expr DOT expr SQUARER                    { TermCons ($2, $4) }
 	| DOUBLESQUAREL list_innerf SQUARER                { $2 }
 	| SQUAREL list_innerl DOUBLESQUARER                { $2 }
 	| SQUAREL list_innera SQUARER                      { $2 }
@@ -147,16 +144,19 @@ list:
 
 list_innera:
 	| expr COMMA list_innera                           { TermCons ($1, $3)}
+	| expr DOT expr                                    { TermCons ($1, $3)}
 	| expr COMMA                                       { TermCons ($1, TermUnit) }
 	| expr                                             { TermCons ($1, TermUnit) }
 
 list_innerf:
 	| expr COMMA list_innerf                           { TermConsFirst ($1, $3)}
+	| expr DOT expr                                    { TermConsFirst ($1, $3)}
 	| expr COMMA                                       { TermConsFirst ($1, TermUnit) }
 	| expr                                             { TermConsFirst ($1, TermUnit) }
 
 list_innerl:
 	| expr COMMA list_innerl                           { TermConsLast ($1, $3)}
+	| expr DOT expr                                    { TermConsLast ($1, $3)}
 	| expr COMMA                                       { TermConsLast ($1, TermUnit) }
 	| expr                                             { TermConsLast ($1, TermUnit) }
 

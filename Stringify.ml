@@ -8,7 +8,7 @@ type term_to_stringf = DefaultFormatting | IntegerFormatting | StringFormatting 
 let rec type_to_string t = match t with
 	| TypeUnit                  -> "unit"
 	| TypeNum                   -> "int"
-	| TypePair           (a, b) -> sprintf "pair<%s,%s>" (type_to_string a) (type_to_string b)
+	| TypePair           (a, b) -> sprintf "pair<%s, %s>" (type_to_string a) (type_to_string b)
 	| TypeList                a -> sprintf "list<%s>" (type_to_string a)
 	| TypeFun            (a, b) -> sprintf "%s → %s" (type_to_string a) (type_to_string b)
 
@@ -83,6 +83,7 @@ let rec term_to_stringf t f = match t with
 	| TermBitwiseOr      (a, b) -> sprintf "%s ∨ %s" (term_to_stringf a f) (term_to_stringf b f)
 
 	| TermScope               a -> sprintf "{%s}" (term_to_stringf a f)
+	| TermWhile (TermUnaryNot (TermNum 0), a) -> sprintf "loop %s" (term_to_stringf a f)
 	| TermWhile          (p, a) -> sprintf "while %s do %s" (term_to_stringf p f) (term_to_stringf a f)
 	| TermDo             (p, a) -> sprintf "do %s while %s" (term_to_stringf a f) (term_to_stringf p f)
 	| TermFor      (a, b, c, d) -> sprintf "for %s; %s; %s then %s" (term_to_stringf a f) (term_to_stringf b f) (term_to_stringf c f) (term_to_stringf d f)
@@ -142,7 +143,16 @@ let rec term_to_stringf t f = match t with
 	| TermIf          (p, a, b) -> sprintf "%s ? %s : %s" (term_to_stringf p f) (term_to_stringf a f) (term_to_stringf b f)
 	| TermAutoBind       (i, e) -> sprintf "let %s = %s" i (term_to_stringf e f)
 	| TermBind        (i, t, e) -> sprintf "%s %s = %s" (type_to_string t) i (term_to_stringf e f)
-	| TermReBind         (i, e) -> sprintf "%s = %s" i (term_to_stringf e f)
+	| TermReBind         (i, e) -> (match e with
+		| TermPlus       (TermVar ii, ee) when i = ii -> sprintf "%s += %s" ii (term_to_stringf ee f)
+		| TermSubtract   (TermVar ii, ee) when i = ii -> sprintf "%s -= %s" ii (term_to_stringf ee f)
+		| TermMultiply   (TermVar ii, ee) when i = ii -> sprintf "%s *= %s" ii (term_to_stringf ee f)
+		| TermDivide     (TermVar ii, ee) when i = ii -> sprintf "%s /= %s" ii (term_to_stringf ee f)
+		| TermModulo     (TermVar ii, ee) when i = ii -> sprintf "%s %%= %s" ii (term_to_stringf ee f)
+		| TermBitwiseAnd (TermVar ii, ee) when i = ii -> sprintf "%s &= %s" ii (term_to_stringf ee f)
+		| TermBitwiseXOr (TermVar ii, ee) when i = ii -> sprintf "%s ^= %s" ii (term_to_stringf ee f)
+		| TermBitwiseOr  (TermVar ii, ee) when i = ii -> sprintf "%s |= %s" ii (term_to_stringf ee f)
+		| _                                    -> sprintf "%s = %s" i (term_to_stringf e f))
 	| TermUnBind              i -> sprintf "unbind %s" i
 	| TermLambda (i, v, TypeUnit, e) -> sprintf "λ() %s" (term_to_stringf e f)
 	| TermLambda   (i, v, t, e) -> sprintf "λ(%s %s) %s" (type_to_string t) i (term_to_stringf e f)
