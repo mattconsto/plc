@@ -33,6 +33,7 @@ rule lexer = parse
 
 	| "list.rev"    | "List.Rev"                                                  { STRING_REV }
 
+	| "let"       | "Let"                                                         { LET }
 	| "unbind"    | "Unbind"                                                      { UNBIND }
 	| "in"        | "In"                                                          { IN }
 	| "if"        | "If"                                                          { IF }

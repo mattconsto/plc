@@ -12,7 +12,7 @@ let rec typeOf env e = flush_all(); match e with
 	| TermPair (a, b) -> TypePair ((typeOf env a), (typeOf env b))
 	| TermList      a -> TypeList (typeOf env (List.hd a))
 	| TermVar       x -> (try lookup env x with EnvironmentReachedHead e -> raise (TypeError ("Cannot find a binding for variable " ^ x)))
-	| TermString    s -> TypePair (TypeNum, TypeNum)
+	| TermString    s -> let rec exp i l = if i < 0 then l else exp (i - 1) (TypePair (TypeNum, l)) in exp (String.length s - 1) TypeUnit
 
 	| TermReadInt | TermReadString | TermReadBool -> TypeNum
 	| TermClear -> TypeUnit
@@ -74,6 +74,8 @@ let rec typeOf env e = flush_all(); match e with
 	| TermBind (x, t, e) -> (let temp = (typeOf (bind env x t) e) in match (temp = t) with
 		| true -> ignore (bind env x t); t
 		| false -> raise (TypeError (Printf.sprintf "While binding got %s, expected %s" (type_to_string temp) (type_to_string t))))
+
+	| TermAutoBind (x, e) -> (let temp = (typeOf (bind env x (typeOf env e)) e) in (ignore (bind env x temp); temp))
 
 	| TermReBind (x, e) -> (match ((typeOf env e) = (lookup env x)) with
 		| true  -> typeOf env e

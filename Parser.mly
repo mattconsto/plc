@@ -17,7 +17,7 @@
 %token ASSIGN_EQUAL ASSIGN_ADDITION ASSIGN_SUBTRACT ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MODULO ASSIGN_AND ASSIGN_XOR ASSIGN_OR
 
 %token TRUE FALSE
-%token UNBIND IN IF THEN ELSE MATCH WHILE DONE DO LOOP DONE FOR BREAK CONTINUE RETURN ASSERT EXIT CONS HEAD TAIL CLEAR PRINT_INT PRINT_STRING PRINT_BOOL PRINTLN_INT PRINTLN_STRING PRINTLN_BOOL ERROR_INT ERROR_STRING ERROR_BOOL ERRORLN_INT ERRORLN_STRING ERRORLN_BOOL READ_INT READ_STRING READ_BOOL RANDOM LENGTH
+%token UNBIND LET IN IF THEN ELSE MATCH WHILE DONE DO LOOP DONE FOR BREAK CONTINUE RETURN ASSERT EXIT CONS HEAD TAIL CLEAR PRINT_INT PRINT_STRING PRINT_BOOL PRINTLN_INT PRINTLN_STRING PRINTLN_BOOL ERROR_INT ERROR_STRING ERROR_BOOL ERRORLN_INT ERRORLN_STRING ERRORLN_BOOL READ_INT READ_STRING READ_BOOL RANDOM LENGTH
 
 %token LAMBDA ROUNDL ROUNDR UTYPE ITYPE LTYPE PTYPE FUNTYPE
 %token MAP FOLD FILTER LIMIT
@@ -32,21 +32,21 @@
 
 /* Low */
 %right FUNTYPE
-%left UNBIND IN IF THEN ELSE MATCH WHILE DONE DO LOOP FOR DONE BREAK CONTINUE RETURN ASSERT EXIT CONS HEAD TAIL CLEAR PRINT_INT PRINT_STRING PRINT_BOOL PRINTLN_INT PRINTLN_STRING PRINTLN_BOOL ERROR_INT ERROR_STRING ERROR_BOOL ERRORLN_INT ERRORLN_STRING ERRORLN_BOOL READ_INT READ_STRING READ_BOOL RANDOM
+%left UNBIND LET IN IF THEN ELSE MATCH WHILE DONE DO LOOP FOR DONE BREAK CONTINUE RETURN ASSERT EXIT CONS HEAD TAIL CLEAR PRINT_INT PRINT_STRING PRINT_BOOL PRINTLN_INT PRINTLN_STRING PRINTLN_BOOL ERROR_INT ERROR_STRING ERROR_BOOL ERRORLN_INT ERRORLN_STRING ERRORLN_BOOL READ_INT READ_STRING READ_BOOL RANDOM
 %left IDENT STRING
 %left STRING_LOWER STRING_UPPER STRING_REV MATH_MIN MATH_MAX MATH_ABS MATH_SIGN MATH_SQRT MATH_LOG MATH_LN MATH_FACT
 %left TRUE FALSE
-%left ASSIGN_EQUAL ASSIGN_ADDITION ASSIGN_SUBTRACT ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MODULO ASSIGN_AND ASSIGN_XOR ASSIGN_OR
-%left QUESTION COLON
+%right ASSIGN_EQUAL ASSIGN_ADDITION ASSIGN_SUBTRACT ASSIGN_MULTIPLY ASSIGN_DIVIDE ASSIGN_MODULO ASSIGN_AND ASSIGN_XOR ASSIGN_OR
+%right QUESTION COLON
 %left BITWISE_OR
 %left BITWISE_XOR
 %left BITWISE_AND
 %left COMPARE_E COMPARE_NE
 %left COMPARE_LT COMPARE_LTE COMPARE_GT COMPARE_GTE
 %left BITWISE_LEFT BITWISE_RIGHT
-%left MINUS PLUS
+%right MINUS PLUS
 %left BINARY_POWER BINARY_MULTIPLY BINARY_DIVIDE BINARY_MODULO
-%left UNARY_NEGATION
+%right UNARY_NEGATION
 %left SQUAREL SQUARER
 %left ROUNDL ROUNDR
 %left CURLYL CURLYR
@@ -129,18 +129,35 @@ data:
 	| STRING                                           { TermString $1 }
 
 list:
+	| BITWISE_OR SQUARER                               { TermUnit }
+	| SQUAREL BITWISE_OR                               { TermUnit }
 	| SQUAREL SQUARER                                  { TermUnit }
+	| BITWISE_OR expr DOT expr SQUARER                 { TermConsFirst ($2, $4) }
+	| SQUAREL expr DOT expr BITWISE_OR                 { TermConsLast ($2, $4) }
 	| SQUAREL expr DOT expr SQUARER                    { TermCons ($2, $4) }
-	| SQUAREL list_inner SQUARER                       { $2 }
+	| BITWISE_OR list_innerf SQUARER                   { $2 }
+	| SQUAREL list_innerl BITWISE_OR                   { $2 }
+	| SQUAREL list_innera SQUARER                      { $2 }
+	| expr COLON COLON expr                            { TermCons ($1, $4) }
 	| CONS expr expr                                   { TermCons ($2, $3) }
 	| HEAD expr                                        { TermHead $2 }
 	| TAIL expr                                        { TermTail $2 }
 	| LENGTH expr                                      { TermLength $2 }
 
-list_inner:
-	| expr COMMA list_inner                            { TermCons ($1, $3)}
+list_innera:
+	| expr COMMA list_innera                           { TermCons ($1, $3)}
 	| expr COMMA                                       { TermCons ($1, TermUnit) }
 	| expr                                             { TermCons ($1, TermUnit) }
+
+list_innerf:
+	| expr COMMA list_innerf                           { TermConsFirst ($1, $3)}
+	| expr COMMA                                       { TermConsFirst ($1, TermUnit) }
+	| expr                                             { TermConsFirst ($1, TermUnit) }
+
+list_innerl:
+	| expr COMMA list_innerl                           { TermConsLast ($1, $3)}
+	| expr COMMA                                       { TermConsLast ($1, TermUnit) }
+	| expr                                             { TermConsLast ($1, TermUnit) }
 
 loop:
 	| WHILE expr DO expr                               { TermWhile ($2, $4) }
@@ -150,6 +167,7 @@ loop:
 
 assign:
 	| type_spec IDENT ASSIGN_EQUAL expr                { TermBind ($2, $1, $4) }
+	| LET IDENT ASSIGN_EQUAL expr                      { TermAutoBind ($2, $4) }
 
 	| IDENT ASSIGN_EQUAL expr                          { TermReBind ($1, $3) }
 	| IDENT ASSIGN_ADDITION expr                       { TermReBind ($1, TermPlus ((TermVar $1), $3)) }
@@ -216,17 +234,17 @@ io:
 	| PRINT_STRING expr                                { TermPrintString $2 }
 	| PRINT_BOOL expr                                  { TermPrintBool $2 }
 
-	| PRINTLN_INT expr                                 { TermCons(TermPrintInt $2, TermPrintString (TermNum 10)) }
-	| PRINTLN_STRING expr                              { TermCons(TermPrintString $2, TermPrintString (TermNum 10)) }
-	| PRINTLN_BOOL expr                                { TermCons(TermPrintBool $2, TermPrintString (TermNum 10)) }
+	| PRINTLN_INT expr                                 { TermConsFirst(TermPrintInt $2, TermPrintString (TermNum 10)) }
+	| PRINTLN_STRING expr                              { TermConsFirst(TermPrintString $2, TermPrintString (TermNum 10)) }
+	| PRINTLN_BOOL expr                                { TermConsFirst(TermPrintBool $2, TermPrintString (TermNum 10)) }
 
 	| ERROR_INT expr                                   { TermErrorInt $2 }
 	| ERROR_STRING expr                                { TermErrorString $2 }
 	| ERROR_BOOL expr                                  { TermErrorBool $2 }
 
-	| ERRORLN_INT expr                                 { TermCons(TermErrorInt $2, TermErrorString (TermNum 10)) }
-	| ERRORLN_STRING expr                              { TermCons(TermErrorString $2, TermErrorString (TermNum 10)) }
-	| ERRORLN_BOOL expr                                { TermCons(TermErrorBool $2, TermErrorString (TermNum 10)) }
+	| ERRORLN_INT expr                                 { TermConsFirst(TermErrorInt $2, TermErrorString (TermNum 10)) }
+	| ERRORLN_STRING expr                              { TermConsFirst(TermErrorString $2, TermErrorString (TermNum 10)) }
+	| ERRORLN_BOOL expr                                { TermConsFirst(TermErrorBool $2, TermErrorString (TermNum 10)) }
 
 	| RANDOM expr expr                                 { TermRandom ($2, $3) }
 	| RANDOM expr                                      { TermRandom (TermNum 0, $2) }

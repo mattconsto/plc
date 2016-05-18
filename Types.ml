@@ -84,6 +84,7 @@ type aquaTerm =
 
 	| TermVar of string
 	| TermIf of aquaTerm * aquaTerm * aquaTerm
+	| TermAutoBind of string * aquaTerm
 	| TermBind of string * aquaType * aquaTerm
 	| TermReBind of string * aquaTerm
 	| TermUnBind of string
