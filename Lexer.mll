@@ -104,6 +104,8 @@ rule lexer = parse
 	| ')'                                                                         { ROUNDR }
 	| '['                                                                         { SQUAREL }
 	| ']'                                                                         { SQUARER }
+	| "⟦"                                                                         { DOUBLESQUAREL }
+	| "⟧"                                                                         { DOUBLESQUARER }
 
 	| ':'                                                                         { COLON }
 	| '?'                                                                         { QUESTION }

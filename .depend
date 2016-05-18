@@ -15,13 +15,13 @@ Language.cmx : Types.cmx Stringify.cmx Parser.cmx Lexer.cmx Evaluator.cmx \
     Environment.cmx Checker.cmx Language.cmi
 Lexer.cmo : Parser.cmi
 Lexer.cmx : Parser.cmx
+mysplinterpreter.cmo : Types.cmo Stringify.cmo Language.cmi Evaluator.cmi \
+    Environment.cmi Checker.cmi
+mysplinterpreter.cmx : Types.cmx Stringify.cmx Language.cmx Evaluator.cmx \
+    Environment.cmx Checker.cmx
 Parser.cmo : Types.cmo Language.cmi Parser.cmi
 Parser.cmx : Types.cmx Language.cmx Parser.cmi
 Stringify.cmo : Types.cmo Environment.cmi
 Stringify.cmx : Types.cmx Environment.cmx
 Types.cmo : Environment.cmi
 Types.cmx : Environment.cmx
-mysplinterpreter.cmo : Types.cmo Stringify.cmo Language.cmi Evaluator.cmi \
-    Environment.cmi Checker.cmi
-mysplinterpreter.cmx : Types.cmx Stringify.cmx Language.cmx Evaluator.cmx \
-    Environment.cmx Checker.cmx

@@ -23,7 +23,7 @@
 %token MAP FOLD FILTER LIMIT
 
 /* Brackets */
-%token CURLYL CURLYR ROUNDL ROUNDR SQUAREL SQUARER
+%token CURLYL CURLYR ROUNDL ROUNDR SQUAREL SQUARER DOUBLESQUAREL DOUBLESQUARER
 
 %token COLON QUESTION
 %token EOF SEMI_COLON DOT COMMA
@@ -47,7 +47,7 @@
 %right MINUS PLUS
 %left BINARY_POWER BINARY_MULTIPLY BINARY_DIVIDE BINARY_MODULO
 %right UNARY_NEGATION
-%left SQUAREL SQUARER
+%left SQUAREL SQUARER DOUBLESQUAREL DOUBLESQUARER
 %left ROUNDL ROUNDR
 %left CURLYL CURLYR
 /* High */
@@ -81,6 +81,9 @@ exprs:
 
 expr:
 	| SEMI_COLON                                       { TermUnit }
+
+	| list                                             { $1 }
+	| data                                             { $1 }
 
 	| loop                                             { $1 }
 	| assign                                           { $1 }
@@ -118,9 +121,6 @@ expr:
 	| FOLD expr expr expr                              { TermFold ($2, $3, $4) }
 	| LIMIT expr expr                                  { TermLimit ($2, $3) }
 
-	| list                                             { $1 }
-	| data                                             { $1 }
-
 data:
 	| FALSE                                            { TermNum 0 }
 	| TRUE                                             { TermUnaryNot (TermNum 0) } /* True = !False */
@@ -129,14 +129,14 @@ data:
 	| STRING                                           { TermString $1 }
 
 list:
-	| BITWISE_OR SQUARER                               { TermUnit }
-	| SQUAREL BITWISE_OR                               { TermUnit }
+	| DOUBLESQUAREL SQUARER                            { TermUnit }
+	| SQUAREL DOUBLESQUARER                            { TermUnit }
 	| SQUAREL SQUARER                                  { TermUnit }
-	| BITWISE_OR expr DOT expr SQUARER                 { TermConsFirst ($2, $4) }
-	| SQUAREL expr DOT expr BITWISE_OR                 { TermConsLast ($2, $4) }
+	| DOUBLESQUAREL expr DOT expr SQUARER              { TermConsFirst ($2, $4) }
+	| SQUAREL expr DOT expr DOUBLESQUARER              { TermConsLast ($2, $4) }
 	| SQUAREL expr DOT expr SQUARER                    { TermCons ($2, $4) }
-	| BITWISE_OR list_innerf SQUARER                   { $2 }
-	| SQUAREL list_innerl BITWISE_OR                   { $2 }
+	| DOUBLESQUAREL list_innerf SQUARER                { $2 }
+	| SQUAREL list_innerl DOUBLESQUARER                { $2 }
 	| SQUAREL list_innera SQUARER                      { $2 }
 	| expr COLON COLON expr                            { TermCons ($1, $4) }
 	| CONS expr expr                                   { TermCons ($2, $3) }

@@ -165,7 +165,9 @@ let rec eval co ce ci env e = flush_all (); match e with
 	| TermPair          (a, b) -> TermPair(a, b)
 	| TermCons          (a, b) -> (match eval co ce ci env a, eval co ce ci env b with n, m -> TermPair(n, m))
 	| TermConsFirst     (a, b) -> (match eval co ce ci env a, eval co ce ci env b with n, m -> n)
-	| TermConsLast      (a, b) -> (match eval co ce ci env a, eval co ce ci env b with n, m -> m)
+	| TermConsLast      (a, b) -> (match eval co ce ci env a, eval co ce ci env b with
+		| n, TermUnit -> n
+		| n, m        -> m)
 	| TermHead           a     -> (match eval co ce ci env a with TermPair (n, m) -> n | _ -> raise (StuckTerm "Head"))
 	| TermTail           a     -> (match eval co ce ci env a with TermPair (n, m) -> m | _ -> raise (StuckTerm "Tail"))
 	| TermLength 				 a 		 -> (let rec length num l = match l with
