@@ -8,7 +8,7 @@ type term_to_stringf = DefaultFormatting | IntegerFormatting | StringFormatting 
 let rec type_to_string t = match t with
 	| TypeUnit                  -> "unit"
 	| TypeNum                   -> "int"
-	| TypePair           (a, b) -> sprintf "pair<%s, %s>" (type_to_string a) (type_to_string b)
+	| TypePair           (a, b) -> sprintf "pair<%s,%s>" (type_to_string a) (type_to_string b)
 	| TypeList                a -> sprintf "list<%s>" (type_to_string a)
 	| TypeFun            (a, b) -> sprintf "%s → %s" (type_to_string a) (type_to_string b)
 
@@ -147,6 +147,7 @@ let rec term_to_stringf t f = match t with
 	| TermLambda (i, v, TypeUnit, e) -> sprintf "λ() %s" (term_to_stringf e f)
 	| TermLambda   (i, v, t, e) -> sprintf "λ(%s %s) %s" (type_to_string t) i (term_to_stringf e f)
 	| TermApply          (a, b) -> sprintf "%s(%s)" (term_to_stringf a f) (term_to_stringf b f)
+	| TermTypeOf              a -> sprintf "typeOf %s" (term_to_stringf a f)
 
 let term_to_string t = term_to_stringf t DefaultFormatting
 

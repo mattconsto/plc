@@ -54,6 +54,7 @@ rule lexer = parse
 	| "cons"      | "Cons"                                                        { CONS }
 	| "head"      | "Head"                                                        { HEAD }
 	| "tail"      | "Tail"                                                        { TAIL }
+	| "typeof"    | "typeOf"   | "TypeOf"                                         { TYPEOF }
 
 	| "string.lower"           | "String.Lower"                                   { STRING_LOWER }
 	| "string.upper"           | "String.Upper"                                   { STRING_UPPER }

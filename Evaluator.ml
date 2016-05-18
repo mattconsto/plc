@@ -191,6 +191,8 @@ let rec eval co ce ci env e = flush_all (); match e with
 			with Return a -> a)
 		| _ -> raise (StuckTerm "Apply"))
 
+	| TermTypeOf             a -> eval co ce ci env (TermString (type_to_string (Checker.typeOf global_types a)))
+
 	| TermLambda(x, old, t, a) -> TermLambda(x, env, t, a)
 
 	| TermMap           (f, d) -> (let rec map func data result =

@@ -90,6 +90,7 @@ type aquaTerm =
 	| TermUnBind of string
 	| TermLambda of string * aquaTerm environment * aquaType * aquaTerm
 	| TermApply of aquaTerm * aquaTerm
+	| TermTypeOf of aquaTerm
 
 	| TermMap of aquaTerm * aquaTerm
 	| TermFold of aquaTerm * aquaTerm * aquaTerm
