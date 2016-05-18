@@ -178,8 +178,8 @@ let rec eval co ce ci env e = flush_all (); match e with
 		| false -> eval co ce ci scope b
 		| true  -> eval co ce ci scope a)
 
-	| TermBind       (x, t, a) -> let temp = eval co ce ci (bind env x a) a in (ignore (rebind env x temp); temp)
-	| TermAutoBind      (x, a) -> let temp = eval co ce ci (bind env x a) a in (ignore (rebind env x temp); temp)
+	| TermBind       (x, t, a) -> let temp = eval co ce ci (bind env x a) a in (ignore (bind env x temp); temp)
+	| TermAutoBind      (x, a) -> let temp = eval co ce ci (bind env x a) a in (ignore (bind env x temp); temp)
 	| TermReBind        (x, a) -> let temp = eval co ce ci env a in (ignore (rebind env x temp); temp)
 	| TermUnBind         x     -> let temp = lookup env x in (ignore (unbind env x); temp)
 

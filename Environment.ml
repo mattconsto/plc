@@ -23,9 +23,9 @@ let rec rebind env str thing = match env with
 let bind env str thing = match env with
 	| Head             -> raise (EnvironmentReachedHead str)
 	| Env (parent, gs) -> (try
-			rebind env str thing
+			(match (List.find (fun (name, value) -> name = str) !gs) with name, old -> old := thing)
 		with
-			| EnvironmentReachedHead str -> gs := ((str, ref thing) :: !gs); env)
+			| Not_found -> gs := ((str, ref thing) :: !gs)); env
 
 (* Remove an entry from the tree of environments *)
 let rec unbind env str = match env with
