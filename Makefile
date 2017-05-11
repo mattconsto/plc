@@ -33,11 +33,11 @@ mysplinterpreter: $(OBJS) mysplinterpreter.cmo
 	$(OCAMLC) -o $@ $(COMMON) $(OBJS)
 
 # Compile an ML module interface
-%.cmi : %.mli
+%.cmi: %.mli
 	$(OCAMLC) -c $<
 
 # Compile an ML module implementation
-%.cmo : %.ml
+%.cmo: %.ml
 	$(OCAMLC) -c $<
 
 # Generate ML files from a Parser definition file
@@ -53,7 +53,7 @@ Parser.ml Parser.mli: Parser.mly
 	@chmod -w $@
 
 # Clean up the directory
-clean::
+clean:
 	rm -rf Lexer.ml Parser.ml Parser.mli *.o *.cmo *.cmi Parser.output c TAGS *~
 
 # Rebuild intermodule dependencies
@@ -61,3 +61,7 @@ depend: $(DEPEND)
 	ocamldep *.mli *.ml > .depend
 
 full: clean depend all
+
+fix-cygwin64:
+	rebase -b 0x06440000 /usr/lib/ocaml/stublibs/dllunix.so 
+	rebase -b 0x06510000 /usr/lib/ocaml/stublibs/dllcamlstr.so 

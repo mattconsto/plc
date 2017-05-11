@@ -8,8 +8,8 @@ open Stringify;; (* ;; is required *)
 if (Array.length Sys.argv) < 2 then (
 	Printf.fprintf stdout "Interactive Mode:\n";
 	while true do
-		Printf.fprintf stdout "-> ";
-		Printf.fprintf stdout "<- %s\n" (term_to_string (run stdout stdout stdin (read_line ())))
+		Printf.fprintf stdout "> ";
+		Printf.fprintf stdout "= %s\n" (term_to_string (run stdout stdout stdin (read_line ())))
 	done
 ) else (
 	try (

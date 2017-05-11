@@ -1,27 +1,29 @@
-Checker.cmi : Types.cmo Environment.cmi
-Environment.cmi :
-Evaluator.cmi : Types.cmo Environment.cmi
-Language.cmi : Types.cmo
-Parser.cmi : Types.cmo
 Checker.cmo : Types.cmo Stringify.cmo Environment.cmi Checker.cmi
 Checker.cmx : Types.cmx Stringify.cmx Environment.cmx Checker.cmi
+Checker.cmi : Types.cmo Environment.cmi
 Environment.cmo : Environment.cmi
 Environment.cmx : Environment.cmi
-Evaluator.cmo : Types.cmo Stringify.cmo Environment.cmi Evaluator.cmi
-Evaluator.cmx : Types.cmx Stringify.cmx Environment.cmx Evaluator.cmi
+Environment.cmi :
+Evaluator.cmo : Types.cmo Stringify.cmo Environment.cmi Checker.cmi \
+    Evaluator.cmi
+Evaluator.cmx : Types.cmx Stringify.cmx Environment.cmx Checker.cmx \
+    Evaluator.cmi
+Evaluator.cmi : Types.cmo Environment.cmi
 Language.cmo : Types.cmo Stringify.cmo Parser.cmi Lexer.cmo Evaluator.cmi \
     Environment.cmi Checker.cmi Language.cmi
 Language.cmx : Types.cmx Stringify.cmx Parser.cmx Lexer.cmx Evaluator.cmx \
     Environment.cmx Checker.cmx Language.cmi
+Language.cmi : Types.cmo
 Lexer.cmo : Parser.cmi
 Lexer.cmx : Parser.cmx
-mysplinterpreter.cmo : Types.cmo Stringify.cmo Language.cmi Evaluator.cmi \
-    Environment.cmi Checker.cmi
-mysplinterpreter.cmx : Types.cmx Stringify.cmx Language.cmx Evaluator.cmx \
-    Environment.cmx Checker.cmx
 Parser.cmo : Types.cmo Language.cmi Parser.cmi
 Parser.cmx : Types.cmx Language.cmx Parser.cmi
+Parser.cmi : Types.cmo
 Stringify.cmo : Types.cmo Environment.cmi
 Stringify.cmx : Types.cmx Environment.cmx
 Types.cmo : Environment.cmi
 Types.cmx : Environment.cmx
+mysplinterpreter.cmo : Types.cmo Stringify.cmo Language.cmi Evaluator.cmi \
+    Environment.cmi Checker.cmi
+mysplinterpreter.cmx : Types.cmx Stringify.cmx Language.cmx Evaluator.cmx \
+    Environment.cmx Checker.cmx
